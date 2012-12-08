@@ -1,0 +1,53 @@
+
+                           JGoodies Common
+                            Version 1.2.1
+                            Release Notes
+                        
+
+CHANGES in 1.2.1
+
+    o Fixed a bug in ArrayListModel and LinkedListModel with 
+      missing ListDataEvents in #removeAll and #retainAll.
+      The old code depends on a specific implementation of
+      #removeAll and #retainAll that may vary with the platform.
+      
+
+CHANGES in 1.2
+
+    o Fixed missing contents change in LinkedListModel's list iterator.
+    o Removed SystemUtils#IS_JAVA_1_4
+    o Removed SystemUtils#IS_JAVA_5_OR_LATER
+    o Added SystemUtils#HAS_MODERN_RASTERIZER
+    o Added SystemUtils#IS_LAF_WINDOWS_XP_ENABLED
+    o Added SystemUtils#IS_LOW_RESOLUTION
+
+
+CHANGES in 1.1.1
+
+    o Added Objects#deepCopy(Object).
+    o Source code improvements.
+
+
+CHANGES in 1.1
+
+    o Added interfaces ObservableBean and ObservableBean2.
+    o Removed generics from EmptyFormat.
+
+
+CHANGES in 1.0.1
+
+    o Empty*Format#format returns the 'toAppendTo' parameter
+      for the empty value instead of a new StringBuffer.
+
+
+CHANGES in 1.0
+
+    o Added Format wrappers:
+      - AbstractWrappedDateFormat
+      - EmptyDateFormat
+      - EmptyNumberFormat
+      - EmptyFormat
+    o Added tests for the empty formats.
+    o Added Preconditions#checkNotNull(String, String, Object...).
+    
+    
