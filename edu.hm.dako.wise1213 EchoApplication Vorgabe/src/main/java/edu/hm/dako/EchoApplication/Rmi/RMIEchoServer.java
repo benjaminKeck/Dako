@@ -47,7 +47,7 @@ public class RMIEchoServer
    	    // RMI Registry lokal starten
    	    try {
    	    	rmiRegistry = java.rmi.registry.LocateRegistry.createRegistry(1099);
-   	    	System.out.println("RMI registry bereit und wartet..");
+   	    	System.out.println("RMI registry bereit und wartet");
    	    	log.debug("RMI registry bereit");
    	    } catch (Exception e) {
    	    	e.printStackTrace();

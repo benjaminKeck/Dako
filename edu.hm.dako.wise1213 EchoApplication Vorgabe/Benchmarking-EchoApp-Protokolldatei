@@ -350,3 +350,4 @@ Variation der Threadanzahl, Single-threaded TCP, 10, 6, 7, 5, 10, 1000, 1000, 10
 Variation der Threadanzahl, Multi-threaded TCP, 10, 3, 4, 3, 89, 1000, 1000, 1000, 0, 15, 29.11.2012 9:35:21, 29.11.2012 9:35:32
 Variation der Threadanzahl, Single-threaded TCP, 10, 3, 4, 2, 6, 1000, 1000, 1000, 0, 15, 8.12.2012 15:19:31, 8.12.2012 15:19:41
 Variation der Threadanzahl, Multi-threaded RMI, 10, 1, 1, 0, 0, 1000, 1000, 1000, 0, 14, 8.12.2012 15:21:54, 8.12.2012 15:21:55
+Variation der Threadanzahl, Multi-threaded RMI, 10, 1, 1, 0, 0, 1000, 1000, 1000, 0, 14, 8.12.2012 15:32:44, 8.12.2012 15:32:44
