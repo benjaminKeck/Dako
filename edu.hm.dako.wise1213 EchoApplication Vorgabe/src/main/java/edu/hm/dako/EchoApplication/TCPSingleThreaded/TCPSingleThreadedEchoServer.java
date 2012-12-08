@@ -69,7 +69,7 @@ public class TCPSingleThreadedEchoServer {
 		try {
 
 			serverSocket = new ServerSocket(serverPort, backlog);
-			System.out.println("TCPSingleThreadedEchoServer wartet auf Clients...");
+			System.out.println("TCPSingleThreadedEchoServer wartet auf Clients.....");
 		} catch (IOException e) {
 			log.debug("Exception bei der Socket-Erzeugung: " + e);
 			System.exit(9);
