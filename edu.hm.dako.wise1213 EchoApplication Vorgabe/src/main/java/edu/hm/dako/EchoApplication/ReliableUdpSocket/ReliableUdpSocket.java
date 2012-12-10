@@ -52,8 +52,13 @@ public class ReliableUdpSocket {
 				outputStreamAnDieObereSchicht.flush();
 				while (status != ConnectionStatus.CLOSED) {
 					// TODO
+					this.wait(100);
+					
 				}
 			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} finally {
 				try {
@@ -268,6 +273,8 @@ public class ReliableUdpSocket {
 		this.remotePort = serverPort;
 
 		//TODO
+		//das war Herr Mandl gesagt hat...
+		ReliableUdpServerSocket reliableServerSocket = new ReliableUdpServerSocket(serverPort, this);
 
 	}
 

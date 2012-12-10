@@ -83,8 +83,7 @@ public class ReliableUdpServerSocket {
 	 * @param localPort
 	 * @throws SocketException
 	 */
-	protected ReliableUdpServerSocket(Integer localPort,
-			ReliableUdpSocket reliableUdpSocket) throws SocketException {
+	protected ReliableUdpServerSocket(Integer localPort, ReliableUdpSocket reliableUdpSocket) throws SocketException {
 		// normalen Konstruktor aufrufen
 		this(localPort);
 		// Den Server beim ReliableUdpSocket setzen

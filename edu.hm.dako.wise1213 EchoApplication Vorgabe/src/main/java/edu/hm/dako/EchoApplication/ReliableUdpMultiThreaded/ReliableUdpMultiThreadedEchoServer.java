@@ -71,8 +71,7 @@ public class ReliableUdpMultiThreadedEchoServer extends Thread {
 
 		try {
 			serverSocket = new ReliableUdpServerSocket(serverPort);
-			System.out
-					.println("TCPMultiThreadedEchoServer wartet auf Clients...");
+			System.out.println("TCPMultiThreadedEchoServer wartet auf Clients...");
 		} catch (IOException e) {
 			log.debug("Exception bei der Socket-Erzeugung: " + e);
 			System.exit(9);
@@ -87,7 +86,7 @@ public class ReliableUdpMultiThreadedEchoServer extends Thread {
 
 			// neuen Serverthread erstellen
 			ReliableUdpMultiThreadedEchoServer thread = new ReliableUdpMultiThreadedEchoServer(socket1);
-
+			
 			// connection in Liste eintragen
 			connections.put(thread.getName(), socket1);
 
