@@ -274,8 +274,16 @@ public class ReliableUdpSocket {
 
 		//TODO
 		//das war Herr Mandl gesagt hat...
-		ReliableUdpServerSocket reliableServerSocket = new ReliableUdpServerSocket(serverPort, this);
-
+		//ReliableUdpServerSocket reliableServerSocket = new ReliableUdpServerSocket(serverPort, this);
+		Integer port = 5100;
+		while(ReliableUdpServerSocket.aktivePortsUndDerenListener.containsKey(++port)){
+			//Zähle port hoch
+		}
+		//verwendeterBasisSocket = socket.
+		verwendeterBasisSocket = new ReliableUdpServerSocket(port);
+		System.out.println("verwendeterBasisSocket: "+verwendeterBasisSocket.toString());
+		init();
+		
 	}
 
 	private void init() {
