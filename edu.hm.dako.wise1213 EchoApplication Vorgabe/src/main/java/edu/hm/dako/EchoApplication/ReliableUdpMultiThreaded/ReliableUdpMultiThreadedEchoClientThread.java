@@ -3,6 +3,7 @@ package edu.hm.dako.EchoApplication.ReliableUdpMultiThreaded;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Calendar;
 
@@ -13,6 +14,7 @@ import edu.hm.dako.EchoApplication.Basics.AbstractClientThread;
 import edu.hm.dako.EchoApplication.Basics.EchoPDU;
 import edu.hm.dako.EchoApplication.Basics.SharedClientStatistics;
 import edu.hm.dako.EchoApplication.ReliableUdpSocket.ReliableUdpSocket;
+import edu.hm.dako.EchoApplication.ReliableUdpSocket.ReliableUdpObject;
 
 
 /**
@@ -101,8 +103,8 @@ public class ReliableUdpMultiThreadedEchoClientThread extends
 		try {
 			System.out.println(this.getName()+": ReliableUdpSocket erstellen ("+remoteServerAddress+", "+serverPort+")");
 			con = new ReliableUdpSocket(remoteServerAddress, serverPort);
-		     // out = new ObjectOutputStream(con.getOutputStream());
-		     // in = new ObjectInputStream(con.getInputStream());
+		     out = new ObjectOutputStream(con.getOutputStream());
+		     in = new ObjectInputStream(con.getInputStream());
 		      localPort = con.getLocalPort();
 		      currentPort = con.getPort();
 		      log.debug(threadName + ": Verbindung zum Server aufgebaut mit Port " + localPort);
@@ -154,13 +156,20 @@ public class ReliableUdpMultiThreadedEchoClientThread extends
 				}
 				
 				
+				
 				//Message wird gesendet
-				out.writeObject(echoSend);
-				out.flush();
+				//out.writeObject(echoSend);
+				//out.flush();
+				ReliableUdpObject obj = new ReliableUdpObject();
+				obj.setData(echoSend);
+				obj.setId(numberOfClient);
+				con.sendIt(InetAddress.getByName(remoteServerAddress), serverPort, obj);
 			}
 			catch (IOException e1) {		
 				e1.printStackTrace();
 			} 
+			
+			/*
 			try{
 				// Antwort entgegennehmen
 				EchoPDU echoRec = (EchoPDU) in.readObject();
@@ -177,7 +186,7 @@ public class ReliableUdpMultiThreadedEchoClientThread extends
 				System.out.println("Fehler in Typkonvertierung");
 				e.printStackTrace();
 			} 
-			
+			*/
 			//Wartezeit
 			try {
 				Thread.sleep(clientThinkTime);

@@ -123,6 +123,7 @@ public class ReliableUdpSocket {
 	public class ReceivedPacketProcessorThread extends Thread {
 		public ReceivedPacketProcessorThread() {
 			setName("ReceivedPacketProcessorThread: " + getLocalPort());
+			System.out.println("ReceivedPacketProcessorThread: " + getLocalPort());
 		}
 
 		@Override
@@ -135,7 +136,7 @@ public class ReliableUdpSocket {
 						continue;
 					// TODO
 					//EchoPDU rec = (EchoPDU)reveivedPdu.getData();
-					
+					System.out.println("data: "+reveivedPdu.getData());
 					
 				}
 			} catch (InterruptedException e) {
@@ -270,22 +271,24 @@ public class ReliableUdpSocket {
 			throws SocketException {
 		try {
 			this.remoteAddress = InetAddress.getByName(remoteServerAddress);
+			//System.out.println("remoteAdress gebunden: "+remoteServerAddress);
 		} catch (UnknownHostException e) {
-			throw new SocketException("Unknown Host: " + remoteServerAddress);
+			throw new SocketException("Unknown Host__: " + remoteServerAddress);
 		}
 		this.remotePort = serverPort;
 
 		//TODO
-		Integer port = 5100;
-		while(ReliableUdpServerSocket.aktivePortsUndDerenListener.containsKey(++port)){
+		//Integer port = 5100;
+		while(ReliableUdpServerSocket.aktivePortsUndDerenListener.containsKey(++this.remotePort)){
 			
 		}
 		//verwendeterBasisSocket = socket.
-		verwendeterBasisSocket = new ReliableUdpServerSocket(port);
+		verwendeterBasisSocket = new ReliableUdpServerSocket(this.remotePort);
 		System.out.println("verwendeterBasisSocketport: "+verwendeterBasisSocket.port);
 		//status = ConnectionStatus.WAITING;
+		socket = verwendeterBasisSocket.unreliableSocket;
 		init();
-		System.out.println("init fertig");
+		//System.out.println("init fertig");
 	}
 
 	private void init() {

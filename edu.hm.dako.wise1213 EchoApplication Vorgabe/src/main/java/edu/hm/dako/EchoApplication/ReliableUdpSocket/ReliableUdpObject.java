@@ -10,7 +10,7 @@ import java.io.Serializable;
  * @version 1.0.1
  */
 
-class ReliableUdpObject implements Serializable{
+public class ReliableUdpObject implements Serializable{
 
 	private static final long serialVersionUID = 1000011111L;
 	public long id;

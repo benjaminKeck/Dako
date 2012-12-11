@@ -59,7 +59,7 @@ public class ReliableUdpMultiThreadedEchoServer extends Thread {
 		try {
 			out = new ObjectOutputStream(incoming.getOutputStream());
 			in = new ObjectInputStream(incoming.getInputStream());
-			System.out.println("Verbindung angelegt: " + incoming.getPort());
+			System.out.println("Server_"+this.getName()+"_Verbindung angelegt: " + incoming.getPort());
 		} catch (Exception e) {
 			// TODO
 		}
@@ -103,9 +103,7 @@ public class ReliableUdpMultiThreadedEchoServer extends Thread {
 		EchoPDU receivedPdu = new EchoPDU();
 		long startTime;
 
-		System.out.println(this.getName()
-				+ ": Verbindung mit neuem Client aufgebaut, Remote-TCP-Port "
-				+ con.getPort());
+		System.out.println(this.getName()+ ": Verbindung mit neuem Client aufgebaut, Remote-TCP-Port "+ con.getPort());
 
 		try {
 			log.debug("Standardgroesse des Empfangspuffers der Verbindung: "
@@ -123,6 +121,7 @@ public class ReliableUdpMultiThreadedEchoServer extends Thread {
 			try {
 				// Echo-Request entgegennehmen
 				receivedPdu = (EchoPDU) in.readObject();
+				System.out.println("YAY_: "+receivedPdu.getMessage());
 				startTime = System.nanoTime();
 				log.debug("Request empfangen von "
 						+ receivedPdu.getClientName() + ": "

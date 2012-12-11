@@ -12,6 +12,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.varia.ReloadingPropertyConfigurator;
+
+import edu.hm.dako.EchoApplication.Basics.EchoPDU;
+import edu.hm.dako.EchoApplication.ReliableUdpSocket.ReliableUdpSocket.ReceivedPacketProcessorThread;
 
 /**
  * Klasse ReliableUDPSeverSocket
@@ -161,9 +165,25 @@ public class ReliableUdpServerSocket {
 		public void run() {
 			while (!isInterrupted()) {
 				try {
-					ReliableUdpObject receivedPDU = (ReliableUdpObject) unreliableSocket
-							.receive(100);
+					ReliableUdpObject receivedPDU = (ReliableUdpObject) unreliableSocket.receive(100);
 					// TODO
+										
+					String remoteAdress = ""+unreliableSocket.getRemoteAddress();
+					int remotePort = unreliableSocket.getRemotePort();
+					remoteAdress = remoteAdress.substring(1);
+					//System.out.println("remoteAdress: "+remoteAdress+", port: "+remotePort);
+					
+					ReliableUdpSocket s = new ReliableUdpSocket(remoteAdress, remotePort);
+					//s.inputStreamDerOberenSchicht.=receivedPDU.getData();
+					if(!waitingSockets.contains(s))
+						waitingSockets.add(s);
+					
+					System.out.println("M: "+((EchoPDU)receivedPDU.getData()).getMessage());
+					//waitingSockets.add(((EchoPDU)receivedPDU).getServerThreadName());
+					//reliableSockets.
+					//waitingSockets.add(new ReliableUdpSocket(receivedPDU., serverPort))
+					
+					receivedPDU.setAck(true);
 
 				} catch (SocketTimeoutException e) {
 					// Der Timeout ist abgelaufen, einfach nochmal versuchen

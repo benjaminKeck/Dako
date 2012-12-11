@@ -100,8 +100,7 @@ public class UnreliableUdpSocket {
 		try {
 //			log.info("RECEIVE MIT TIMEOUT: "+timeout);
 			socket.setSoTimeout(timeout);
-			// System.out.println("RECEIVE: Maximale Wartezeit: " +
-			// timeout +" ms");
+			//System.out.println("RECEIVE: Maximale Wartezeit: " + timeout +" ms");
 		} catch (SocketException e) {
 			log.error("RECEIVE: "
 					+ "Fehler beim Einstellen der maximalen Wartezeit");
@@ -115,6 +114,7 @@ public class UnreliableUdpSocket {
 			// Blockiert nur, bis Timeout abgelaufen ist
 			socket.receive(packet);
 			log.debug("RECEIVE: Empfangene Datenlaenge:  " + packet.getLength());
+			//System.out.println("RECEIVE: Empfangene Datenlaenge:  " + packet.getLength());
 
 		} catch (IOException e2) {
 //			log.error("RECEIVE: " + "Fehler beim Empfangen einer PDU ueber UDP",e2);
@@ -127,17 +127,15 @@ public class UnreliableUdpSocket {
 		Object pdu;
 		try {
 
-			// System.out.println("RECEIVE: " +
-			// "Verfuegbare Bytes im Inputstream des UDP-Sockets:" +
-			// ois.available());
+			//System.out.println("RECEIVE: " + "Verfuegbare Bytes im Inputstream des UDP-Sockets:" + ois.available());
 
 			pdu = ois.readObject();
 
 			remoteAddress = packet.getAddress();
 			remotePort = packet.getPort();
 
-			log.debug("RECEIVE: " + packet.getPort() + "->"
-					+ socket.getLocalPort());
+			log.debug("RECEIVE: " + packet.getPort() + "->"	+ socket.getLocalPort());
+		//	System.out.println("RECEIVE: " + packet.getPort() + "->"	+ socket.getLocalPort());
 
 		} catch (ClassNotFoundException e) {
 			log.error("RECEIVE: " + "ClassNotFoundException:", e);
@@ -163,10 +161,16 @@ public class UnreliableUdpSocket {
 			throws IOException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		ObjectOutputStream os = new ObjectOutputStream(out);
+		
+		//ReliableUdpObject ruo = new ReliableUdpObject();
+		//ruo.setData(pdu);
+	
 		os.writeObject(pdu);
+		
 		byte[] bytes = out.toByteArray();
 
 		log.debug("SEND: zu sendende Bytes: " + bytes.length);
+		System.out.println("zu sendende Bytes: "+ bytes.length);
 //		if(random.nextInt()%20==0){
 //			log.warn("NACHRICHT WURDE VERWORFEN");
 //			System.out.println("NACHRICHT WURDE VERWORFEN");
