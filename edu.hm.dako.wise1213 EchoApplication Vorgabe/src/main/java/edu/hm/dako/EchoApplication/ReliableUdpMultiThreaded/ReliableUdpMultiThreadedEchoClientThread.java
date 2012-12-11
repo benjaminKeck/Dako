@@ -98,8 +98,9 @@ public class ReliableUdpMultiThreadedEchoClientThread extends
 		threadName = getName();
 	    
 		// Verbindung zum Server aufbauen
-		try { 
-		      con = new ReliableUdpSocket(remoteServerAddress, serverPort);
+		try {
+			System.out.println(this.getName()+": ReliableUdpSocket erstellen ("+remoteServerAddress+", "+serverPort+")");
+			con = new ReliableUdpSocket(remoteServerAddress, serverPort);
 		     // out = new ObjectOutputStream(con.getOutputStream());
 		     // in = new ObjectInputStream(con.getInputStream());
 		      localPort = con.getLocalPort();

@@ -16,6 +16,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import edu.hm.dako.EchoApplication.Basics.EchoPDU;
+
 /**
  * Klasse ReliableUDPSocket
  * 
@@ -132,12 +134,13 @@ public class ReliableUdpSocket {
 					if (reveivedPdu == null)
 						continue;
 					// TODO
+					//EchoPDU rec = (EchoPDU)reveivedPdu.getData();
+					
+					
 				}
 			} catch (InterruptedException e) {
 				if (status != ConnectionStatus.CLOSED) {
-					log.error(
-							"Unvorhergesehene Unterbrechung der Bearbeitung ankommender Pakete",
-							e);
+					log.error("Unvorhergesehene Unterbrechung der Bearbeitung ankommender Pakete",e);
 					status = ConnectionStatus.CLOSED;
 				}
 			} 
@@ -198,7 +201,7 @@ public class ReliableUdpSocket {
 	 * auf Basis von ReiableUDPSocket
 	 */
 	public enum ConnectionStatus {
-		CLOSED, READY_TO_SEND, SENDING
+		CLOSED, READY_TO_SEND, SENDING, WAITING
 	};
 
 	private ConnectionStatus status = ConnectionStatus.CLOSED;
@@ -273,17 +276,16 @@ public class ReliableUdpSocket {
 		this.remotePort = serverPort;
 
 		//TODO
-		//das war Herr Mandl gesagt hat...
-		//ReliableUdpServerSocket reliableServerSocket = new ReliableUdpServerSocket(serverPort, this);
 		Integer port = 5100;
 		while(ReliableUdpServerSocket.aktivePortsUndDerenListener.containsKey(++port)){
-			//Zähle port hoch
+			
 		}
 		//verwendeterBasisSocket = socket.
 		verwendeterBasisSocket = new ReliableUdpServerSocket(port);
-		System.out.println("verwendeterBasisSocket: "+verwendeterBasisSocket.toString());
+		System.out.println("verwendeterBasisSocketport: "+verwendeterBasisSocket.port);
+		//status = ConnectionStatus.WAITING;
 		init();
-		
+		System.out.println("init fertig");
 	}
 
 	private void init() {
@@ -302,7 +304,9 @@ public class ReliableUdpSocket {
 	 * werden können
 	 */
 	private void initializeCommunicationStreams() {
-		new ReceivedPacketProcessorThread().start();
+		ReceivedPacketProcessorThread rt;
+		rt = new ReceivedPacketProcessorThread();
+		rt.start();
 		/**
 		 * Durch die PipedStreams koennen Nachrichten, die in die
 		 * outputStreamAnDieObereSchicht ueber writeObject() geschrieben werden
