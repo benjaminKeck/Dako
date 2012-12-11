@@ -140,8 +140,7 @@ public class UDPMultiThreadedEchoServer extends Thread {
 				echoSend.setMessage(echoPdu.getMessage() + "_vomServerZurueck");
 				echoSend.setServerTime(System.nanoTime() - startTime);
 
-				serverSocket.send(pdu.getRemoteAddress(), pdu.getRemotePort(),
-						echoSend);
+				serverSocket.send(pdu.getRemoteAddress(), pdu.getRemotePort(),echoSend);
 
 			} catch (IOException e) {
 
@@ -149,10 +148,9 @@ public class UDPMultiThreadedEchoServer extends Thread {
 			}
 
 			if (echoPdu.getLastRequest()) {
-				System.out.println("Letzter Request des Clients "
-						+ echoPdu.getClientName());
+				System.out.println("Letzter Request des Clients "+ echoPdu.getClientName());
 				finished = true;
-				serverSocket.close();
+				//serverSocket.close();
 			}
 
 		}

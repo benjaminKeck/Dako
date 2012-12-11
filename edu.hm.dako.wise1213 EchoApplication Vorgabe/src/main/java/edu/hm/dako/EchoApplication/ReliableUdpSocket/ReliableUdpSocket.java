@@ -130,8 +130,10 @@ public class ReliableUdpSocket {
 
 		@Override
 		public void run() {
+			
 			try {
 				while (status != ConnectionStatus.CLOSED) {
+					System.out.println("ReceivedPacketProcessorThread.......");
 					ReliableUdpObject reveivedPdu = receivedPackets.poll(100,
 							TimeUnit.MILLISECONDS);
 					if (reveivedPdu == null)
@@ -139,6 +141,7 @@ public class ReliableUdpSocket {
 					// TODO
 					status = ConnectionStatus.READY_TO_SEND;
 					waitTillConnectionIsAccepted(reveivedPdu);
+					
 					//EchoPDU rec = (EchoPDU)reveivedPdu.getData();
 					System.out.println("data: "+((EchoPDU)reveivedPdu.getData()).getMessage());
 					
@@ -195,6 +198,7 @@ public class ReliableUdpSocket {
 	OutputStream outputStreamDerOberenSchicht;
 	ObjectInputStream inputStreamVonDerOberenSchicht;
 
+	
 	/*
 	 * Der zugehoerige ServerSocket, der auf einen Port lauscht und alle
 	 * zugehoerigen Verbindungen verwaltet
@@ -261,6 +265,7 @@ public class ReliableUdpSocket {
 		this.socket = basisSocket.unreliableSocket;
 		verwendeterBasisSocket = basisSocket;
 		init();
+		status = ConnectionStatus.SENDING;
 	}
 
 	/**
@@ -379,6 +384,8 @@ public class ReliableUdpSocket {
 		
 		log.info("CLOSING SOCKET " + getConnectionString());
 		// TODO
+		//socket.close();
+		status = ConnectionStatus.CLOSED;
 	}
 
 	/**

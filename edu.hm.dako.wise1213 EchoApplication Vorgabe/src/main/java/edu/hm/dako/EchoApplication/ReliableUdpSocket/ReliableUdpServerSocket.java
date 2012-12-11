@@ -176,6 +176,7 @@ public class ReliableUdpServerSocket {
 					
 					ReliableUdpSocket s = new ReliableUdpSocket(remoteAdress, remotePort);
 					s.process(receivedPDU);
+					
 					s.accept();
 				//	s.inputStreamVonDerOberenSchicht
 					//s.inputStreamDerOberenSchicht.=receivedPDU.getData();

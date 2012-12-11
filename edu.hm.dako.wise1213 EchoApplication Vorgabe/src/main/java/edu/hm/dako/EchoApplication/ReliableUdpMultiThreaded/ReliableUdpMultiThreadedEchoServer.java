@@ -117,7 +117,7 @@ public class ReliableUdpMultiThreadedEchoServer extends Thread {
 		}
 
 		while (!finished) {
-
+			
 			try {
 				// Echo-Request entgegennehmen
 				//Über Streams lesen und schreiben...
@@ -135,7 +135,7 @@ public class ReliableUdpMultiThreadedEchoServer extends Thread {
 				log.debug("Unbekannte Objektklasse empfangen: " + e);
 				finished = true;
 				continue;
-			}
+			} 
 			try {
 				// Echo-Response senden
 				EchoPDU sendPdu = new EchoPDU();
