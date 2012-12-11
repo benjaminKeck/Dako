@@ -120,6 +120,7 @@ public class ReliableUdpMultiThreadedEchoServer extends Thread {
 
 			try {
 				// Echo-Request entgegennehmen
+				//Über Streams lesen und schreiben...
 				receivedPdu = (EchoPDU) in.readObject();
 				System.out.println("YAY_: "+receivedPdu.getMessage());
 				startTime = System.nanoTime();

@@ -69,35 +69,41 @@ public class UDPMultiThreadedEchoServer extends Thread {
 			System.exit(9);
 		}
 
-		boolean finished = false;
 		EchoPDU receivedPdu;
-
+		boolean finished = false;
 		while (!finished) {
+			// Auf ankommende Verbindungsaufbauwuensche warten und diese
+			// in eigenen Threads bearbeiten
 
 			try {
+				// Verbindung und EchoPDU entgegennehmen
 				receivedPdu = (EchoPDU) serverSocket.receive(receivingTimeout);
 
+				// Neues RemoteObject anlegen
 				UdpRemoteObject receivedRemoteObject = new UdpRemoteObject(
 						serverSocket.getRemoteAddress(),
 						serverSocket.getRemotePort(), receivedPdu);
 
+				// Wenn das erhaltene PDU nicht leer war erzeuge einen neuen
+				// serverThread
 				if (receivedPdu != null) {
 					UDPMultiThreadedEchoServer serverThread = new UDPMultiThreadedEchoServer(
 							receivedRemoteObject);
-					serverThread.start();
-					connections.put(serverThread.getName(),
-					serverSocket.getLocalAddress());
-					numberOfWorkerThread++;
-				}
 
-				if (receivedPdu.getLastRequest()) {
-					System.out.println("Letzter Request des Clients "
-							+ receivedPdu.getClientName());
-					finished = true;
+					// Connection in die Liste eintragen
+					connections.put(serverThread.getName(),	serverSocket.getLocalAddress());
+
+					numberOfWorkerThread++;
+
+					// Serverthread starten
+					serverThread.start();
 				}
 
 			} catch (IOException e) {
 				// e.printStackTrace();
+
+				break;
+				
 
 			}
 
@@ -113,16 +119,19 @@ public class UDPMultiThreadedEchoServer extends Thread {
 
 		boolean finished = false;
 		long startTime = System.nanoTime();
-		EchoPDU echoPdu = (EchoPDU) pdu.getObject();
 
-		
 		while (!finished) {
-			setName("WorkerThread-" + echoPdu.getClientName());
-			System.out.println(this.getName()
-					+ ": WorkerThread uebernimmt Request von "
-					+ echoPdu.getClientName());
+
+			// Echo-Request entgegennehmen
+			EchoPDU echoPdu = (EchoPDU) pdu.getObject();
+			// setName("WorkerThread-" + echoPdu.getClientName());
+			// System.out.println(this.getName()
+			// + ": WorkerThread uebernimmt Request von "
+			// + echoPdu.getClientName());
 
 			try {
+
+				// Echo an den Client senden
 				EchoPDU echoSend = new EchoPDU();
 				log.debug("Serverzeit: " + (System.nanoTime() - startTime)
 						+ " ns");
@@ -131,7 +140,7 @@ public class UDPMultiThreadedEchoServer extends Thread {
 				echoSend.setMessage(echoPdu.getMessage() + "_vomServerZurueck");
 				echoSend.setServerTime(System.nanoTime() - startTime);
 
-				serverSocket.send(serverSocket.getRemoteAddress(), serverPort,
+				serverSocket.send(pdu.getRemoteAddress(), pdu.getRemotePort(),
 						echoSend);
 
 			} catch (IOException e) {
@@ -139,28 +148,37 @@ public class UDPMultiThreadedEchoServer extends Thread {
 				e.printStackTrace();
 			}
 
-			// Kurz warten
-   	    	try {
-    			Thread.sleep(1000);
-    		}
-    		catch (InterruptedException e3){}
-    		  	
-    		System.out.println(this.getName() + ": Verbindung mit Client abbauen, Remote-UDP-Port " + serverSocket.getRemotePort());
-    		
-   	    	serverSocket.close();   	
-
-	    	log.debug(this.getName() + " beendet sich");  
-	    	System.out.println(this.getName()+" beendet sich");
-	    	
-	    	//Verbindung wird aus der Liste gelöscht
-	    	connections.remove(this.getName());
-	    	
-	    	//Wenn nun in Der Verbindungsliste kein Eintrag mehr vorhanden ist
-	    	//bedeutet das das dies der letzte Thread ist und nun keiner mehr kommt.
-			if(connections.isEmpty()){
-				System.out.println("alle ServerThreads fertig");
+			if (echoPdu.getLastRequest()) {
+				System.out.println("Letzter Request des Clients "
+						+ echoPdu.getClientName());
+				finished = true;
+				serverSocket.close();
 			}
-		}// TODO
+
+		}
+		// Kurz warten
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e3) {
+		}
+
+		System.out.println(this.getName()
+				+ ": Verbindung mit Client abbauen, Remote-UDP-Port "
+				+ pdu.getRemotePort());
+
+		log.debug(this.getName() + " beendet sich");
+		System.out.println(this.getName() + " beendet sich");
+
+		// Verbindung wird aus der Liste gelöscht
+		connections.remove(this.getName());
+
+		// Wenn nun in Der Verbindungsliste kein Eintrag mehr vorhanden ist
+		// bedeutet das das dies der letzte Thread ist und nun keiner mehr
+		// kommt.
+		if (connections.isEmpty()) {
+			System.out.println("alle ServerThreads fertig");
+		}
+		// TODO
 
 	} // run
 }

@@ -150,7 +150,7 @@ public class UDPSingleThreadedEchoClientThread extends AbstractClientThread
 			 
 			      //Das Echo des Servers empfangen
 			      EchoPDU echoRec = (EchoPDU)con.receive(receivingTimeout);
-			      
+			      System.out.println("rec: "+echoRec.getMessage());
 			      // RTT berechnen
 			      rtt = System.nanoTime() - rttStartTime;
 			      // Response-Zaehler erhoehen

@@ -54,15 +54,12 @@ public class ReliableUdpSocket {
 				outputStreamAnDieObereSchicht.flush();
 				while (status != ConnectionStatus.CLOSED) {
 					// TODO
-					this.wait(100);
+					//inputStreamVonDerOberenSchicht=inputStreamDerOberenSchicht.read();
 					
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} finally {
+			}  finally {
 				try {
 					log.info("CLOSING outputStreamAnDieObereSchicht");
 					outputStreamAnDieObereSchicht.close();
@@ -93,9 +90,11 @@ public class ReliableUdpSocket {
 					Object o = inputStreamVonDerOberenSchicht.readObject();
 					// Warte bis wieder gesendet werden darf
 					// TODO
-
+					this.wait(100);
 					// versenden der Nachricht mit Sendewiederholung
 					// TODO
+					outputStreamAnDieObereSchicht.writeObject(o);
+					
 				}
 
 			} catch (ClassNotFoundException e1) {
@@ -103,6 +102,9 @@ public class ReliableUdpSocket {
 			} catch (IOException e) {
 				if (status != ConnectionStatus.CLOSED)
 					log.error(e);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			} finally {
 				try {
 					log.info("CLOSING inputStreamVonDerOberenSchicht");
@@ -135,8 +137,10 @@ public class ReliableUdpSocket {
 					if (reveivedPdu == null)
 						continue;
 					// TODO
+					status = ConnectionStatus.READY_TO_SEND;
+					waitTillConnectionIsAccepted(reveivedPdu);
 					//EchoPDU rec = (EchoPDU)reveivedPdu.getData();
-					System.out.println("data: "+reveivedPdu.getData());
+					System.out.println("data: "+((EchoPDU)reveivedPdu.getData()).getMessage());
 					
 				}
 			} catch (InterruptedException e) {
@@ -452,7 +456,7 @@ public class ReliableUdpSocket {
 	 */
 	protected void process(ReliableUdpObject receivedPdu) {
 		receivedPackets.add(receivedPdu);
-
+		System.out.println("receivedPdu empfangen");
 	}
 
 	/**

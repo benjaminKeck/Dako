@@ -80,4 +80,11 @@ public class EchoPDU  implements Serializable
 	{
 		return(lastRequest);
 	}
+	public String getMessageText(int len){
+		String t="";
+		for(int i=0;i<len; i++)
+			t+="M";
+		
+		return t;
+	}
 } 

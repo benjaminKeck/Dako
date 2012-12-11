@@ -114,6 +114,7 @@ public class UdpSocket {
 			// Blockiert nur, bis Timeout abgelaufen ist
 			socket.receive(packet);
 			log.debug("RECEIVE: Empfangene Datenlaenge:  " + packet.getLength());
+			//System.out.println("RECEIVE: Empfangene Datenlaenge:  " + packet.getLength());
 
 		} catch (IOException e2) {
 			log.error("RECEIVE: " + "Fehler beim Empfangen einer PDU ueber UDP",e2);

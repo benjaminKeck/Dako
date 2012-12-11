@@ -126,6 +126,10 @@ public class UDPMultiThreadedEchoClientThread extends AbstractClientThread {
 
 		sharedData.incrNumberOfLoggedInClients();
 
+		/**
+		 * Synchronisation mit allen anderen Client-Threads: Warten, bis alle
+		 * Clients angemeldet sind und dann erst mit der Lasterzeugung beginnen
+		 */
 		while (!sharedData.allClientsLoggedIn()) {
 			try {
 				Thread.sleep(100);
@@ -146,27 +150,49 @@ public class UDPMultiThreadedEchoClientThread extends AbstractClientThread {
 				String message = "Laenge: " + messageLength;
 				echoSend.setMessage(message);
 
-				// Das Echo an den Server senden
+				// Letzter Request?
 				if (i == numberOfMessages - 1) {
 					echoSend.setLastRequest(true);
 				}
-				
-				con.send(remoteInetAddress, localPort, echoSend);
 
-				// Das Echo des Servers empfangen
-				EchoPDU echoRec = (EchoPDU) con.receive(receivingTimeout);
-
-				// RTT berechnen
-				rtt = System.nanoTime() - rttStartTime;
-				
-				// Response-Zaehler erhoehen
-				sharedData.incrSentMsgCounter(numberOfClient);
-				sharedData.incrReceivedMsgCounter(numberOfClient, rtt,echoRec.getServerTime());
+				// Das Echo an den Server senden
+				con.send(InetAddress.getByName(remoteServerAddress),
+						serverPort, echoSend);
 
 			} catch (IOException ioe) {
 				System.out.println(ioe);
 			}
 
+			try {
+				// Das Echo des Servers empfangen
+				EchoPDU echoRec = (EchoPDU) con.receive(receivingTimeout);
+				System.out.println("rec: "+echoRec.getMessage());
+				// RTT berechnen
+				rtt = System.nanoTime() - rttStartTime;
+
+				// Response-Zaehler erhoehen
+				sharedData.incrSentMsgCounter(numberOfClient);
+				sharedData.incrReceivedMsgCounter(numberOfClient, rtt,
+						echoRec.getServerTime());
+			} catch (IOException ioe) {
+				System.out.println(ioe);
+			}
+
+			// Wartezeit
+			try {
+				Thread.sleep(clientThinkTime);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
 		}
+		
+		// Statistik ausgeben
+		sharedData.printClientStatistic(numberOfClient);
+		
+		// Socket schlie§en
+		con.close();
+
 	}
+
 }

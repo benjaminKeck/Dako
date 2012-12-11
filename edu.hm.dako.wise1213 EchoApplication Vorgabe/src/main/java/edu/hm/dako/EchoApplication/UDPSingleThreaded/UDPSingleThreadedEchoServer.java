@@ -62,12 +62,11 @@ public class UDPSingleThreadedEchoServer extends Thread {
 			log.debug("Aktuell angemeldete Clients: " + connections.size());
 			EchoPDU echoSend = new EchoPDU();
 			echoSend.setServerTime(System.nanoTime() - startTime);
-			echoSend.setMessage(echoRec.getMessage());
+			echoSend.setMessage(echoRec.getMessage()+"_vonServerzurueck");
 			echoSend.setServerThreadName("SingleServerThread");
 
 			// Das Echo an den Clients senden
-			serverSocket.send(serverSocket.getRemoteAddress(), serverPort,
-					echoSend);
+			serverSocket.send(serverSocket.getRemoteAddress(), serverPort, echoSend);
 			log.debug("versendet: " + serverSocket.getRemoteAddress() + " " + serverPort);
 
 			if (echoRec.getLastRequest() == true) {

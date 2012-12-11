@@ -115,6 +115,7 @@ public class ReliableUdpServerSocket {
 
 		String connectionString = poll.getConnectionString();
 		log.info("PUT CONNECTION TO SOCKETS: " + connectionString);
+		System.out.println("PUT CONNECTION TO SOCKETS: " + connectionString);
 		reliableSockets.put(connectionString, poll);
 		poll.accept();
 		return poll;
@@ -174,6 +175,9 @@ public class ReliableUdpServerSocket {
 					//System.out.println("remoteAdress: "+remoteAdress+", port: "+remotePort);
 					
 					ReliableUdpSocket s = new ReliableUdpSocket(remoteAdress, remotePort);
+					s.process(receivedPDU);
+					s.accept();
+				//	s.inputStreamVonDerOberenSchicht
 					//s.inputStreamDerOberenSchicht.=receivedPDU.getData();
 					if(!waitingSockets.contains(s))
 						waitingSockets.add(s);

@@ -138,7 +138,7 @@ public class TCPSingleThreadedEchoClientThread extends AbstractClientThread {
 				// Echo-Nachricht aufbauen
 				EchoPDU echoSend = new EchoPDU();
 				echoSend.setClientName(this.getName());
-				echoSend.setMessage("MESSAGE:"+(i+1));
+				echoSend.setMessage(echoSend.getMessageText(this.messageLength)+(i+1));
 				
 				// Letzter Request?
 				if (i == numberOfMessages - 1) {
