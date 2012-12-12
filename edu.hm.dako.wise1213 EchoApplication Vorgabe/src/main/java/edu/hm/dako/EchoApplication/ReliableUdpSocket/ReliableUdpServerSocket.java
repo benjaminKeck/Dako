@@ -115,7 +115,7 @@ public class ReliableUdpServerSocket {
 
 		String connectionString = poll.getConnectionString();
 		log.info("PUT CONNECTION TO SOCKETS: " + connectionString);
-		System.out.println("PUT CONNECTION TO SOCKETS: " + connectionString);
+		//System.out.println("PUT CONNECTION TO SOCKETS: " + connectionString);
 		reliableSockets.put(connectionString, poll);
 		poll.accept();
 		return poll;

@@ -55,7 +55,7 @@ public class ReliableUdpSocket {
 				while (status != ConnectionStatus.CLOSED) {
 					// TODO
 					//inputStreamVonDerOberenSchicht=inputStreamDerOberenSchicht.read();
-					
+					System.out.println("Connection offen");
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -265,7 +265,7 @@ public class ReliableUdpSocket {
 		this.socket = basisSocket.unreliableSocket;
 		verwendeterBasisSocket = basisSocket;
 		init();
-		status = ConnectionStatus.SENDING;
+		status = ConnectionStatus.WAITING;
 	}
 
 	/**
@@ -293,7 +293,7 @@ public class ReliableUdpSocket {
 		}
 		//verwendeterBasisSocket = socket.
 		verwendeterBasisSocket = new ReliableUdpServerSocket(this.remotePort);
-		System.out.println("verwendeterBasisSocketport: "+verwendeterBasisSocket.port);
+	//	System.out.println("verwendeterBasisSocketport: "+verwendeterBasisSocket.port);
 		//status = ConnectionStatus.WAITING;
 		socket = verwendeterBasisSocket.unreliableSocket;
 		init();
