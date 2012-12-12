@@ -12,7 +12,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.PropertyConfigurator;
 
 import edu.hm.dako.EchoApplication.Basics.EchoPDU;
-import edu.hm.dako.EchoApplication.TCPMultiThreaded.TCPMultiThreadedEchoServer;
 
 /**
  * Klasse UDPMultiThreadedEchoServer
@@ -69,8 +68,9 @@ public class UDPMultiThreadedEchoServer extends Thread {
 			System.exit(9);
 		}
 
-		EchoPDU receivedPdu;
+		EchoPDU receivedPdu = null;
 		boolean finished = false;
+
 		while (!finished) {
 			// Auf ankommende Verbindungsaufbauwuensche warten und diese
 			// in eigenen Threads bearbeiten
@@ -87,12 +87,9 @@ public class UDPMultiThreadedEchoServer extends Thread {
 				// Wenn das erhaltene PDU nicht leer war erzeuge einen neuen
 				// serverThread
 				if (receivedPdu != null) {
-					//System.out.println("whoop");
+
 					UDPMultiThreadedEchoServer serverThread = new UDPMultiThreadedEchoServer(
 							receivedRemoteObject);
-
-					// Connection in die Liste eintragen
-					connections.put(serverThread.getName(),	serverSocket.getLocalAddress());
 
 					numberOfWorkerThread++;
 
@@ -103,12 +100,14 @@ public class UDPMultiThreadedEchoServer extends Thread {
 			} catch (IOException e) {
 				// e.printStackTrace();
 
+				finished = true;
 				break;
-				
 
 			}
 
 		}
+
+		// serverSocket.close();
 
 	}
 
@@ -119,42 +118,47 @@ public class UDPMultiThreadedEchoServer extends Thread {
 	public void run() {
 
 		boolean finished = false;
-		long startTime = System.nanoTime();
 
-		while (!finished) {
-
-			// Echo-Request entgegennehmen
+		try {
 			EchoPDU echoPdu = (EchoPDU) pdu.getObject();
-			// setName("WorkerThread-" + echoPdu.getClientName());
-			// System.out.println(this.getName()
-			// + ": WorkerThread uebernimmt Request von "
-			// + echoPdu.getClientName());
 
-			try {
+			setName("WorkerThread-" + echoPdu.getClientName());
 
-				// Echo an den Client senden
-				EchoPDU echoSend = new EchoPDU();
-				log.debug("Serverzeit: " + (System.nanoTime() - startTime)
-						+ " ns");
-				echoSend.setServerThreadName(this.getName());
-				echoSend.setClientName(echoPdu.getClientName());
-				echoSend.setMessage(echoPdu.getMessage() + "_vomServerZurueck");
-				echoSend.setServerTime(System.nanoTime() - startTime);
+			System.out.println(this.getName()
+					+ ": WorkerThread uebernimmt Request von "
+					+ echoPdu.getClientName());
 
-				serverSocket.send(pdu.getRemoteAddress(), pdu.getRemotePort(),echoSend);
+			long startTime = System.nanoTime();
 
-			} catch (IOException e) {
+			// Echo an den Client senden
+			EchoPDU echoSend = new EchoPDU();
+			log.debug("Serverzeit: " + (System.nanoTime() - startTime) + " ns");
+			echoSend.setServerThreadName(this.getName());
+			echoSend.setClientName(echoPdu.getClientName());
+			echoSend.setMessage(echoPdu.getMessage() + "_vomServerZurueck");
+			echoSend.setServerTime(System.nanoTime() - startTime);
 
-				e.printStackTrace();
-			}
+			// Connection in die Liste eintragen
+			connections.put(echoPdu.getClientName(),
+					serverSocket.getLocalAddress());
 
 			if (echoPdu.getLastRequest()) {
-				System.out.println("Letzter Request des Clients "+ echoPdu.getClientName());
-				finished = true;
-				//serverSocket.close();
+				System.out.println("Letzter Request des Clients "
+						+ echoPdu.getClientName());
+
+				// Verbindung wird aus der Liste gelšscht
+				connections.remove(this.getName());
+
 			}
 
+			serverSocket.send(pdu.getRemoteAddress(), pdu.getRemotePort(),
+					echoSend);
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
 		}
+
 		// Kurz warten
 		try {
 			Thread.sleep(1000);
@@ -168,16 +172,13 @@ public class UDPMultiThreadedEchoServer extends Thread {
 		log.debug(this.getName() + " beendet sich");
 		System.out.println(this.getName() + " beendet sich");
 
-		// Verbindung wird aus der Liste gelöscht
-		connections.remove(this.getName());
-
 		// Wenn nun in Der Verbindungsliste kein Eintrag mehr vorhanden ist
 		// bedeutet das das dies der letzte Thread ist und nun keiner mehr
 		// kommt.
 		if (connections.isEmpty()) {
 			System.out.println("alle ServerThreads fertig");
-		}
-		// TODO
 
-	} // run
+		}
+
+	}
 }

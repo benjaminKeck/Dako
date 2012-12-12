@@ -166,12 +166,13 @@ public class UDPMultiThreadedEchoClientThread extends AbstractClientThread {
 			try {
 				// Das Echo des Servers empfangen
 				EchoPDU echoRec = (EchoPDU) con.receive(receivingTimeout);
-				System.out.println("rec: "+echoRec.getMessage());
+
 				// RTT berechnen
 				rtt = System.nanoTime() - rttStartTime;
 
 				// Response-Zaehler erhoehen
 				sharedData.incrSentMsgCounter(numberOfClient);
+				if (echoRec != null)
 				sharedData.incrReceivedMsgCounter(numberOfClient, rtt,
 						echoRec.getServerTime());
 			} catch (IOException ioe) {
