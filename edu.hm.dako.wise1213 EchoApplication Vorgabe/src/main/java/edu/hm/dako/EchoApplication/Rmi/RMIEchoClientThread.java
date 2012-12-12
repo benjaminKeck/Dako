@@ -134,7 +134,7 @@ public class RMIEchoClientThread extends AbstractClientThread
 	        	
 	        	EchoPDU send = new EchoPDU();
 				send.setClientName(this.getName());
-				send.setMessage("DASISTDIE_MESSAGE"+(i+1));
+				send.setMessage(send.getMessageText(this.messageLength)+(i+1));
 				
 				if(i>=numberOfMessages-1){
 					send.setLastRequest(true);
@@ -155,9 +155,15 @@ public class RMIEchoClientThread extends AbstractClientThread
 				} catch (RemoteException e) {
 					e.printStackTrace();
 				}
+				//Wartezeit
+				try {
+					Thread.sleep(clientThinkTime);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}	
 	        }
 	        
-	        System.out.println(this.getName()+": hat fertig");
+	        System.out.println(this.getName()+": ist fertig");
 	        
 						
 		}	

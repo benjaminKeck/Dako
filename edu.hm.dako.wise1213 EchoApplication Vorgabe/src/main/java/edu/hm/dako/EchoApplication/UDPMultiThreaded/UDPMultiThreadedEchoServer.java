@@ -87,6 +87,7 @@ public class UDPMultiThreadedEchoServer extends Thread {
 				// Wenn das erhaltene PDU nicht leer war erzeuge einen neuen
 				// serverThread
 				if (receivedPdu != null) {
+					//System.out.println("whoop");
 					UDPMultiThreadedEchoServer serverThread = new UDPMultiThreadedEchoServer(
 							receivedRemoteObject);
 

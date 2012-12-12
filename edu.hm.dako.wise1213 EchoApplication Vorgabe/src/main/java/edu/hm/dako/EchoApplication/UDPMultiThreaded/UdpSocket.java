@@ -109,12 +109,12 @@ public class UdpSocket {
 
 		byte[] bytes = new byte[65527];
 		DatagramPacket packet = new DatagramPacket(bytes, bytes.length);
-
+		//System.out.println("VOR: Empfangene Datenlaenge:  " + packet.getLength());
 		try {
 			// Blockiert nur, bis Timeout abgelaufen ist
 			socket.receive(packet);
 			log.debug("RECEIVE: Empfangene Datenlaenge:  " + packet.getLength());
-			//System.out.println("RECEIVE: Empfangene Datenlaenge:  " + packet.getLength());
+			System.out.println("RECEIVE: Empfangene Datenlaenge:  " + packet.getLength());
 
 		} catch (IOException e2) {
 			log.error("RECEIVE: " + "Fehler beim Empfangen einer PDU ueber UDP",e2);

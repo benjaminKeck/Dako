@@ -36,6 +36,7 @@ import edu.hm.dako.EchoApplication.Basics.EchoPDU;
 
 	/**
 	 * Echo-Methode
+	 * empfängt Message, verarbeitet sie und gibt eine Message zurueck
 	 */
 	public EchoPDU echo(EchoPDU message) throws RemoteException 
 	{	
@@ -44,11 +45,16 @@ import edu.hm.dako.EchoApplication.Basics.EchoPDU;
    	    //Verbingspartner in Map eintragen
    	    connections.put(message.getClientName(), "1");
    	    
+   	    //Neue Message für return
    	    EchoPDU sendPdu = message;	    	
 			
+   	    //Text von empfangener Nachricht verwenden
    	    sendPdu.setMessage(message.getMessage()+"_vom Server zurueck");
+   	    
+   	    //Servername setzen
    	    sendPdu.setServerThreadName(message.getServerThreadName());
    	    
+   	    //Serverzeit eintragen
    	    sendPdu.setServerTime(System.nanoTime() - startTime);
    	    
    	    //Wenn es die letzte Nachricht ist
@@ -65,7 +71,7 @@ import edu.hm.dako.EchoApplication.Basics.EchoPDU;
    	    	}
    	    	
    	    }
-		//TODO
+		
 	   	 return sendPdu;  
 	}
 	

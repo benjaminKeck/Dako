@@ -54,10 +54,20 @@ public class ReliableUdpSocket {
 				outputStreamAnDieObereSchicht.flush();
 				while (status != ConnectionStatus.CLOSED) {
 					// TODO
+					Object obj = data.poll(100, TimeUnit.MILLISECONDS);
+					if(obj==null)
+						continue;
+					
+					
+					outputStreamAnDieObereSchicht.writeObject(obj);
+					outputStreamAnDieObereSchicht.flush();
 					//inputStreamVonDerOberenSchicht=inputStreamDerOberenSchicht.read();
-					System.out.println("Connection offen");
+					//System.out.println("Connection offen");
 				}
 			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}  finally {
 				try {
@@ -85,15 +95,31 @@ public class ReliableUdpSocket {
 			try {
 				// Stream initialisieren
 				inputStreamVonDerOberenSchicht = new ObjectInputStream(pipedIn);
-
+				ReliableUdpObject rObj = new ReliableUdpObject();
+				
+				
 				while (status != ConnectionStatus.CLOSED) {
 					Object o = inputStreamVonDerOberenSchicht.readObject();
 					// Warte bis wieder gesendet werden darf
+					int maxWait=50;
+					while(status==ConnectionStatus.SENDING && maxWait>0){
+						this.wait(30);
+						maxWait--;
+					}
 					// TODO
-					this.wait(100);
+					status = ConnectionStatus.SENDING;
+					
+					rObj.setData(o);
+					rObj.setId(currentOutgoingId++);
 					// versenden der Nachricht mit Sendewiederholung
 					// TODO
-					outputStreamAnDieObereSchicht.writeObject(o);
+					
+					for(int i=0; i<3; i++){
+						sendIt(remoteAddress, remotePort, rObj);
+						
+						this.wait(100);
+					}
+					//outputStreamAnDieObereSchicht.writeObject(o);
 					
 				}
 
@@ -139,11 +165,31 @@ public class ReliableUdpSocket {
 					if (reveivedPdu == null)
 						continue;
 					// TODO
-					status = ConnectionStatus.READY_TO_SEND;
-					waitTillConnectionIsAccepted(reveivedPdu);
+					//status = ConnectionStatus.READY_TO_SEND;
+					lastIncomingId = reveivedPdu.getId();
+					
+					if(!reveivedPdu.isAck()){
+						waitTillConnectionIsAccepted(reveivedPdu);
+						ReliableUdpObject rObj = new ReliableUdpObject();
+						rObj.setAck(true);
+						rObj.setId(currentOutgoingId);
+						currentOutgoingId++;
+						
+						try{
+							sendIt(remoteAddress, remotePort, rObj);
+						}
+						catch(IOException e){
+							e.printStackTrace();
+						}
+						
+						System.out.println("data: "+((EchoPDU)reveivedPdu.getData()).getMessage());
+						data.add(reveivedPdu.getData());
+					}
+					else
+						status = ConnectionStatus.READY_TO_SEND;
+					
 					
 					//EchoPDU rec = (EchoPDU)reveivedPdu.getData();
-					System.out.println("data: "+((EchoPDU)reveivedPdu.getData()).getMessage());
 					
 				}
 			} catch (InterruptedException e) {
@@ -265,7 +311,7 @@ public class ReliableUdpSocket {
 		this.socket = basisSocket.unreliableSocket;
 		verwendeterBasisSocket = basisSocket;
 		init();
-		status = ConnectionStatus.WAITING;
+		status = ConnectionStatus.READY_TO_SEND;
 	}
 
 	/**
@@ -297,7 +343,9 @@ public class ReliableUdpSocket {
 		//status = ConnectionStatus.WAITING;
 		socket = verwendeterBasisSocket.unreliableSocket;
 		init();
+		status = ConnectionStatus.READY_TO_SEND;
 		//System.out.println("init fertig");
+		accept();
 	}
 
 	private void init() {
