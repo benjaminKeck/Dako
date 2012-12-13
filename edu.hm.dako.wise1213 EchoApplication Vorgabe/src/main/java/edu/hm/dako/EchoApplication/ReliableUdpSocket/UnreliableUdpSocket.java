@@ -170,7 +170,7 @@ public class UnreliableUdpSocket {
 		byte[] bytes = out.toByteArray();
 
 		log.debug("SEND: zu sendende Bytes: " + bytes.length);
-		System.out.println("zu sendende Bytes: "+ bytes.length);
+		//System.out.println("zu sendende Bytes: "+ bytes.length);
 //		if(random.nextInt()%20==0){
 //			log.warn("NACHRICHT WURDE VERWORFEN");
 //			System.out.println("NACHRICHT WURDE VERWORFEN");

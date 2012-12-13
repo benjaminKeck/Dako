@@ -17,14 +17,13 @@ import edu.hm.dako.EchoApplication.Basics.EchoPDU;
 /**
  * Klasse RMIEchoServerImpl
  * @author Mandl
- * @author Benjamin Keckes
  */
  public class RMIEchoServerImpl extends UnicastRemoteObject implements RMIEchoServerInterface 
 {	 
 	private static final long serialVersionUID = 99L;
 	private static Log log = LogFactory.getLog(RMIEchoServerImpl.class);
 		
-	// Verbindungstabelle: Hier werden alle aktiven Verbindungen zu Clients verwaltet
+	/** Verbindungstabelle: Hier werden alle aktiven Verbindungen zu Clients verwaltet */
 	private static Map<String, String> connections = new ConcurrentHashMap<String, String>();
 	 
 	/**
@@ -35,35 +34,35 @@ import edu.hm.dako.EchoApplication.Basics.EchoPDU;
 		super();
 	}
 
-	/**
+	/*
 	 * Echo-Methode
-	 * empfängt Message, verarbeitet sie und gibt eine Message zurueck
+	 * empfŠngt Message, verarbeitet sie und gibt eine Message zurueck
 	 */
 	public EchoPDU echo(EchoPDU message) throws RemoteException 
 	{	
    	    long startTime = System.nanoTime();
    	    
-   	    //Verbingspartner in Map eintragen
+   	    /*Verbingspartner in Map eintragen */
    	    connections.put(message.getClientName(), "1");
    	    
-   	    //Neue Message für return
+   	    /*Neue Message fŸr return */
    	    EchoPDU sendPdu = message;	    	
 			
-   	    //Text von empfangener Nachricht verwenden
+   	    /*Text von empfangener Nachricht verwenden */
    	    sendPdu.setMessage(message.getMessage()+"_vom Server zurueck");
    	    
-   	    //Servername setzen
+   	    /*Servername setzen */
    	    sendPdu.setServerThreadName(message.getServerThreadName());
    	    
    	    
-   	    //Wenn es die letzte Nachricht ist
+   	    /*Wenn es die letzte Nachricht ist */
    	    if(sendPdu.getLastRequest()){
    	    	System.out.println("Letzte Nachricht zurueck an "+message.getClientName());
    	    	
-   	    	//Eintrag wird aus Map entfernt
+   	    	/*Eintrag wird aus Map entfernt */
    	    	connections.remove(message.getClientName());
    	    	
-   	    	//Wenn alle Verbindungen beendet sind
+   	    	/*Wenn alle Verbindungen beendet sind */
    	    	if(connections.isEmpty()){
    	    		System.out.println("Server hier beenden");
    	    		//super.unexportObject(this, true);
@@ -72,10 +71,10 @@ import edu.hm.dako.EchoApplication.Basics.EchoPDU;
    	    }
    	   
    	    //System.out.println("serverzeit: "+(System.nanoTime() - startTime));
-   	    //Serverzeit eintragen
+   	    /*Serverzeit eintragen */
    	    sendPdu.setServerTime(System.nanoTime() - startTime);
    	    
-   	    //zurück an den Client
+   	    /*zurück an den Client */
 	   	return sendPdu;  
 	}
 	

@@ -18,49 +18,49 @@ import edu.hm.dako.EchoApplication.Basics.SharedClientStatistics;
 /**
  * Klasse TCPMultiThreadedEchoClientThread
  *  
- * @author Mandl
+ * @author Benjamin Keckes
  *
  */
 public class TCPMultiThreadedEchoClientThread extends AbstractClientThread
 {	 
 		private static Log log = LogFactory.getLog(TCPMultiThreadedEchoClientThread.class);
 				
-	    // Lokaler Port zur Kommunikation mit dem Echo-Server 
+	    /** Lokaler Port zur Kommunikation mit dem Echo-Server */
 	    private int currentPort;
 	    		
-	    // Name des Threads
+	    /** Name des Threads */
 	    private String threadName;
 	    
-	    // Nummer des Echo-Clients
+	    /** Nummer des Echo-Clients */
 	    private int numberOfClient;
 	    
-	    // Laenge einer Nachricht
+	    /** Laenge einer Nachricht */
 	    private int messageLength;
 	    
-	    // Anzahl zu sendender Nachrichten je Client-Thread
+	    /** Anzahl zu sendender Nachrichten je Client-Thread */
 	    private int numberOfMessages;
 	  
-	    // Portnummer des Threads
+	    /** Portnummer des Threads */
 	    private int localPort;
 	    
-	    // Serverport 
+	    /** Serverport */
 	    private int serverPort;
 	    
-	    // Adresse des Servers
+	    /** Adresse des Servers */
 	    private String remoteServerAddress;
 	    
-	    // Denkzeit des Clients zwischen zwei Requests in ms
+	    /** Denkzeit des Clients zwischen zwei Requests in ms */
 	    private int clientThinkTime;
 	    
-	    // Gemeinsame Daten der Threads
+	    /** Gemeinsame Daten der Threads */
 	    private SharedClientStatistics sharedData;
 	    
-	    // Socket-Verbindung
+	    /** Socket-Verbindung */
 	    private Socket con;
 	    private ObjectInputStream in;
 	    private ObjectOutputStream out;
 	  
-	    // Zeitstempel für RTT-Berechnung und Kalender
+	    /** Zeitstempel für RTT-Berechnung und Kalender */
 		private long rttStartTime;
 		private long rtt;
 		
@@ -95,7 +95,7 @@ public class TCPMultiThreadedEchoClientThread extends AbstractClientThread
 			this.setName("EchoClient-".concat(String.valueOf(numberOfClient+1)));    
 			threadName = getName();
 		    
-			// Verbindung zum Server aufbauen
+			/* Verbindung zum Server aufbauen */
 			try { 
 			      con = new Socket(remoteServerAddress, serverPort);
 			      out = new ObjectOutputStream(con.getOutputStream());
@@ -121,7 +121,7 @@ public class TCPMultiThreadedEchoClientThread extends AbstractClientThread
 		{   
 			sharedData.incrNumberOfLoggedInClients();
 			
-	        /**
+	        /*
 	         * Synchronisation mit allen anderen Client-Threads:
 	         * Warten, bis alle Clients angemeldet sind und dann
 	         * erst mit der Lasterzeugung beginnen
@@ -137,20 +137,27 @@ public class TCPMultiThreadedEchoClientThread extends AbstractClientThread
 	        }
 	        
 	        for (int i = 0; i < numberOfMessages; i++) {
-				// RTT-Startzeit ermitteln
+				/* RTT-Startzeit ermitteln */
 				rttStartTime = System.nanoTime();
 				
 				try {
 					
+					/*
+					 * Neues EchoPDU erzeugen
+					 * EchoPDU ClientName setzen
+					 * EchoPDU Nachricht setzen
+					 *  
+					 */
 					EchoPDU echoSend = new EchoPDU();
 					echoSend.setClientName(this.getName());
 					echoSend.setMessage(echoSend.getMessageText(this.messageLength)+(i+1));
-					// Letzter Request?
+					
+					/* Letzter Request? */
 					if (i == numberOfMessages - 1) {
 						echoSend.setLastRequest(true);
 					}
 					
-					//Message wird gesendet
+					/* Message wird gesendet */
 					out.writeObject(echoSend);
 					out.flush();
 				}
@@ -158,12 +165,15 @@ public class TCPMultiThreadedEchoClientThread extends AbstractClientThread
 					e1.printStackTrace();
 				} 
 				try{
-					// Antwort entgegennehmen
+					
+					/* Antwort entgegennehmen */
 					EchoPDU echoRec = (EchoPDU) in.readObject();
 					System.out.println("Client "+this.getName()+": "+echoRec.getMessage()+" von "+echoRec.getServerThreadName());
-					// RTT berechnen
+					
+					/* RTT berechnen */
 					rtt = System.nanoTime() - rttStartTime;
-					// Response-Zaehler erhoehen
+					
+					/* Response-Zaehler erhoehen */
 					sharedData.incrSentMsgCounter(numberOfClient);
 					sharedData.incrReceivedMsgCounter(numberOfClient, rtt, echoRec.getServerTime());
 				}
@@ -174,7 +184,7 @@ public class TCPMultiThreadedEchoClientThread extends AbstractClientThread
 					e.printStackTrace();
 				} 
 				
-				//Wartezeit
+				/* Wartezeit */
 				try {
 					Thread.sleep(clientThinkTime);
 				} catch (InterruptedException e) {
@@ -184,7 +194,7 @@ public class TCPMultiThreadedEchoClientThread extends AbstractClientThread
 			}
 			  
 	        try {
-	        	// Transportverbindung abbauen
+	        	/* Transportverbindung abbauen */
 				out.close();
 				in.close();
 				con.close();

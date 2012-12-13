@@ -19,7 +19,7 @@ import edu.hm.dako.EchoApplication.Basics.EchoPDU;
 /**
  * Klasse TCPMultiThreadedEchoServer
  *  
- * @author Mandl
+ * @author Benjamin Keckes
  *
  */
 public class TCPMultiThreadedEchoServer extends Thread
@@ -30,18 +30,18 @@ public class TCPMultiThreadedEchoServer extends Thread
 		
 		private static int numberOfWorkerThread = 0;
 		
-		// Verbindungstabelle: Hier werden alle aktiven Verbindungen zu Clients verwaltet
+		/** Verbindungstabelle: Hier werden alle aktiven Verbindungen zu Clients verwaltet */
 	    private static Map<String, Socket> connections = new ConcurrentHashMap<String, Socket>();
 	 
-	    // TCP-Socket des Servers (Listen-Socket)
+	    /** TCP-Socket des Servers (Listen-Socket) */
 	    private static ServerSocket serverSocket;
 	    
-		// Transportverbindung und Streams fuer einen Client
+		/** Transportverbindung und Streams fuer einen Client */
 	    private Socket con;
 		private ObjectOutputStream out;
 		private ObjectInputStream in;
 		
-		// Groesse des Empfangspuffers einer TCP-Verbindung in Byte
+		/** Groesse des Empfangspuffers einer TCP-Verbindung in Byte */
 		private static final int receiveBufferSize = 300000;
 	
 	    /**
@@ -51,7 +51,7 @@ public class TCPMultiThreadedEchoServer extends Thread
 		{		
 			 this.con = incoming;
 
-			 // Ein- und Ausgabe-Objektstrom erzeugen
+			 /* Ein- und Ausgabe-Objektstrom erzeugen */
 			 try {
 		        out = new ObjectOutputStream(incoming.getOutputStream());
 		        in = new ObjectInputStream(incoming.getInputStream());
@@ -76,22 +76,21 @@ public class TCPMultiThreadedEchoServer extends Thread
    	    	
    	    	
    	    	while (true) {
-   	    		// Auf ankommende Verbindungsaufbauwuensche warten und diese 
-	    		// in eigenen Threads bearbeiten
+   	    		/* Auf ankommende Verbindungsaufbauwuensche warten und diese in eigenen Threads bearbeiten */
    	    		
    				try {
-   					// Eine Socketanfrage entgegen nehmen
+   					/** Eine Socketanfrage entgegen nehmen */
    					Socket socket1 = serverSocket.accept();
    					
-   					//neuen Serverthread erstellen
+   					/**neuen Serverthread erstellen */
 					TCPMultiThreadedEchoServer thread = new TCPMultiThreadedEchoServer(socket1);
 					
-					//connection in Liste eintragen
+					/**connection in Liste eintragen */
 					connections.put(thread.getName(), socket1);
 					
 					numberOfWorkerThread++;
 					
-					//Serverthread starten
+					/**Serverthread starten */
 					thread.start(); 					
 					
 				} catch (IOException e) {
@@ -104,7 +103,9 @@ public class TCPMultiThreadedEchoServer extends Thread
    	    	 }
    	    }  
    	    
-   	    
+   	    /**
+   	     * Die Threadmethode
+   	     */
    	    public void run()
    	    {	
    	    	boolean finished = false;
@@ -125,7 +126,7 @@ public class TCPMultiThreadedEchoServer extends Thread
    	    	while (!finished) {
    	    		
    	    		try {	
-   	    			// Echo-Request entgegennehmen 
+   	    			/* Echo-Request entgegennehmen */
    	    			receivedPdu = (EchoPDU) in.readObject();
    	    			startTime = System.nanoTime();
    	    			log.debug("Request empfangen von " + receivedPdu.getClientName() + ": " + receivedPdu.getMessage());
@@ -141,7 +142,14 @@ public class TCPMultiThreadedEchoServer extends Thread
   	    			continue;
 				}            
    	    		try {
-   	    			// Echo-Response senden
+   	    			/*
+   	    			* Neues EchoPDU erzeugen
+   	    			* EchoPDU ServerThreadName setzen
+   	    			* EchoPDU ClientName setzen
+   	    			* EchoPDU Nachricht setzen
+   	    			* EchoPDU ServerZeit setzen
+   	    			*  
+   	    			*/
    	    			EchoPDU sendPdu = new EchoPDU();
    	    			log.debug("Serverzeit: " + (System.nanoTime() - startTime) + " ns"); 
    	    			sendPdu.setServerThreadName(this.getName()); 
@@ -149,6 +157,7 @@ public class TCPMultiThreadedEchoServer extends Thread
    	    		    sendPdu.setMessage(receivedPdu.getMessage()+"_vomServerZurueck");
    	    			sendPdu.setServerTime(System.nanoTime() - startTime); 
    	    			
+   	    			/* EchoPDU an den Client zurŸck senden */
    	    			out.writeObject(sendPdu);
    	    			out.flush();
    	    			log.debug("Response gesendet");   	    			
@@ -158,13 +167,16 @@ public class TCPMultiThreadedEchoServer extends Thread
    	    			finished = true;
    	    		}            
    	    		
+   	    		/* 
+   				 * Wenn die letzte Nachricht eingetroffen ist, dann beende die Schleife
+   				 */
    	    		if (receivedPdu.getLastRequest()) {
 	    			System.out.println("Letzter Request des Clients " + receivedPdu.getClientName());
 	    			finished = true;
    	    		}
    	    	}
    	    	
-   	    	// Kurz warten
+   	    	/* Kurz warten */
    	    	try {
     			Thread.sleep(1000);
     		}
@@ -172,6 +184,7 @@ public class TCPMultiThreadedEchoServer extends Thread
     		  	
     		System.out.println(this.getName() + ": Verbindung mit Client abbauen, Remote-TCP-Port " + con.getPort());
     		
+    		/* Verbindung abbauen */
    	    	try {
    	    		out.flush();
    	    		con.close();
@@ -183,11 +196,13 @@ public class TCPMultiThreadedEchoServer extends Thread
 	    	log.debug(this.getName() + " beendet sich");  
 	    	System.out.println(this.getName()+" beendet sich");
 	    	
-	    	//Verbindung wird aus der Liste gelöscht
+	    	/*Verbindung wird aus der Liste gelšscht */
 	    	connections.remove(this.getName());
 	    	
-	    	//Wenn nun in Der Verbindungsliste kein Eintrag mehr vorhanden ist
-	    	//bedeutet das das dies der letzte Thread ist und nun keiner mehr kommt.
+	    	/*Wenn nun in Der Verbindungsliste kein Eintrag mehr vorhanden ist
+	    	 * bedeutet das das dies der letzte Thread ist und nun keiner mehr kommt.
+	    	 * 
+	    	 */
 			if(connections.isEmpty()){
 				System.out.println("alle ServerThreads fertig");
 //				try {
@@ -201,8 +216,8 @@ public class TCPMultiThreadedEchoServer extends Thread
 //				}
 			}
 			
-			//Der Thread wird beendet
+			/* Der Thread wird beendet */
 	    	this.stop();
 	    	
-	 	} // run  	    
+	 	} 	    
  }

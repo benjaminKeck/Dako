@@ -122,10 +122,7 @@ public class UDPMultiThreadedEchoServer extends Thread {
 				if (receivedPdu != null) {
 
 					UDPMultiThreadedEchoServer serverThread = new UDPMultiThreadedEchoServer(receivedRemoteObject);
-
 					numberOfWorkerThread++;
-
-					// Serverthread starten
 					serverThread.start();
 				}
 

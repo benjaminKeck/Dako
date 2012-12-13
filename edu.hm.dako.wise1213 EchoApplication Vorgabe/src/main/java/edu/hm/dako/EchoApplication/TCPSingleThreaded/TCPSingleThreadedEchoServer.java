@@ -1,8 +1,7 @@
 package edu.hm.dako.EchoApplication.TCPSingleThreaded;
 
-import java.io.BufferedReader;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
@@ -31,21 +30,25 @@ public class TCPSingleThreadedEchoServer {
 
 	private static int serverPort = 50000;
 
-	// Verbindungstabelle: Hier werden alle aktiven Verbindungen zu Clients
-	// verwaltet
+	/** Verbindungstabelle: Hier werden alle aktiven Verbindungen zu Clients
+	 * verwaltet 
+	 * 
+	 */
 	private static Map<String, Socket> connections = new ConcurrentHashMap<String, Socket>();
 
-	// TCP-Socket des Servers (Listen-Socket)
+	/** TCP-Socket des Servers (Listen-Socket)*/
 	private static ServerSocket serverSocket;
 
-	// Laenge der Queue des Server-Sockets fuer ankommende
-	// Verbindungsaufbauwuensche
+	/** Laenge der Queue des Server-Sockets fuer ankommende 
+	 * Verbindungsaufbauwuensche
+	 * 
+	 */
 	private static final int backlog = 20;
 
-	// Verbindungszaehler
+	/** Verbindungszaehler */
 	private static long nrConnections = 0;
 
-	// Streams fuer TCP-Verbindung
+	/** Streams fuer TCP-Verbindung */
 	private static ObjectOutputStream out;
 	private static ObjectInputStream in;
 
@@ -65,7 +68,7 @@ public class TCPSingleThreadedEchoServer {
 		PropertyConfigurator.configureAndWatch("log4j.server.properties",
 				60 * 1000);
 
-		// TCP-Serversocket registrieren
+		/* TCP-Serversocket registrieren */
 		try {
 
 			serverSocket = new ServerSocket(serverPort, backlog);
@@ -79,45 +82,45 @@ public class TCPSingleThreadedEchoServer {
 			try {
 				
 				
-				// Auf ankommende Verbindungsaufbauwuensche warten
+				/* Auf ankommende Verbindungsaufbauwuensche warten */
 				Socket socket = serverSocket.accept();
 				
-				//Servernamen ausgeben
+				/*Servernamen ausgeben */
 				System.out.println("Verbindung hergestellt zu "+socket.getInetAddress().getHostName());
 				log.info("Verbindung hergestellt zu "+socket.getInetAddress().getHostName());
 				
-				//In- und Outputstreams festlegen
+				/*In- und Outputstreams festlegen */
 				out = new ObjectOutputStream(socket.getOutputStream());
 				in = new ObjectInputStream(socket.getInputStream());
 				
-				// Echo-Request entgegennehmen
+				/* Echo-Request entgegennehmen */
 				EchoPDU echoRec = (EchoPDU)in.readObject();
 				
-				//Serverzeit messen
+				/*Serverzeit messen */
 				long startTime=System.nanoTime();
 				
-				//Nachricht auf Konsole ausgeben
+				/*Nachricht auf Konsole ausgeben */
 				System.out.println("Server empfaengt von "+echoRec.getClientName()+": "+echoRec.getMessage());
 				
-				//Verbindung in Map speichern
+				/*Verbindung in Map speichern */
 				connections.put(echoRec.getClientName(), socket);
 				
-				//Antwort erstellen
+				/*Antwort erstellen */
 				EchoPDU echoSend = new EchoPDU();
 				
-				//Serverzeit setzen
+				/*Serverzeit setzen */
 				echoSend.setServerTime(System.nanoTime()-startTime);
 				
-				//Message definieren
+				/*Message definieren */
 				echoSend.setMessage(echoRec.getMessage()+"_zurueck_");
 				
-				//
+				/* Threadname setzen */
 				echoSend.setServerThreadName("SingleServerThread");
 				
-				// Echo-Response senden
+				/* Echo-Response senden */
 				out.writeObject(echoSend);
 				
-				// Verbindung schliessen
+				/* Verbindung schliessen */
 				in.close();
 				out.close();
 				socket.close(); 

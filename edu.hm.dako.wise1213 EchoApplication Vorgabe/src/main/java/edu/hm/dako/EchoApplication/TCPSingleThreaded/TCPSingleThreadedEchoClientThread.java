@@ -17,46 +17,46 @@ import edu.hm.dako.EchoApplication.Basics.SharedClientStatistics;
 /**
  * Klasse TCPSingleThreadedEchoClientThread
  * 
- * @author Man
+ * @author Benjamin Keckes
  * 
  */
 public class TCPSingleThreadedEchoClientThread extends AbstractClientThread {
 	private static Log log = LogFactory
 			.getLog(TCPSingleThreadedEchoClientThread.class);
 
-	// Lokaler Port zur Kommunikation mit dem Echo-Server
+	/** Lokaler Port zur Kommunikation mit dem Echo-Server */
 	private int localPort;
 
-	// Name des Threads
+	/** Name des Threads */
 	private String threadName;
 
-	// Nummer des Echo-Clients
+	/** Nummer des Echo-Clients */
 	private int numberOfClient;
 
-	// Laenge einer Nachricht
+	/** Laenge einer Nachricht */
 	private int messageLength;
 
-	// Anzahl zu sendender Nachrichten je Thread
+	/** Anzahl zu sendender Nachrichten je Thread */
 	private int numberOfMessages;
 
-	// Serverport
+	/** Serverport */
 	private int serverPort;
 
-	// Adresse des Servers
+	/** Adresse des Servers */
 	private String remoteServerAddress;
 
-	// Denkzeit des Clients zwischen zwei Requests in ms
+	/** Denkzeit des Clients zwischen zwei Requests in ms */
 	private int clientThinkTime;
 
-	// Gemeinsame Daten der Threads
+	/** Gemeinsame Daten der Threads */
 	private SharedClientStatistics sharedData;
 
-	// Socket-Verbindung
+	/** Socket-Verbindung */
 	private Socket con;
 	private ObjectInputStream in;
 	private ObjectOutputStream out;
 
-	// Zeitstempel für RTT-Berechnung und Kalender
+	/** Zeitstempel für RTT-Berechnung und Kalender */
 	private long rttStartTime;
 	private long rtt;
 
@@ -100,7 +100,7 @@ public class TCPSingleThreadedEchoClientThread extends AbstractClientThread {
 	public void run() {
 		sharedData.incrNumberOfLoggedInClients();
 		
-		/**
+		/*
 		 * Synchronisation mit allen anderen Client-Threads: Warten, bis alle
 		 * Clients angemeldet sind und dann erst mit der Lasterzeugung beginnen
 		 */
@@ -113,61 +113,69 @@ public class TCPSingleThreadedEchoClientThread extends AbstractClientThread {
 		}
 		
 	
-		/**
+		/*
 		 * Senden von Echo-Nachrichten
 		 */
 
 		for (int i = 0; i < numberOfMessages; i++) {
-			// RTT-Startzeit ermitteln
+			/* RTT-Startzeit ermitteln */
 			rttStartTime = System.nanoTime();
 			
 			try {
-				// Verbindung zum Server aufbauen, solange versuchen, bis Verbindung
-				// steht.
-				// Der Server koennte gerade nicht verfuegbar sein und der Verbindungsaufbauversuch 
-				// auf einen Timeout laufen, wenn viele Clients aktiv sind.
+				/**
+				 * Verbindung zum Server aufbauen, solange versuchen, bis Verbindung
+				 * steht.
+				 * Der Server koennte gerade nicht verfuegbar sein und der Verbindungsaufbauversuch 
+				 * auf einen Timeout laufen, wenn viele Clients aktiv sind. 
+				 * 
+				 */
 				con = new Socket(remoteServerAddress, serverPort);
 				
-				//In- und Outputstream
+				/*In- und Outputstream */
 				out = new ObjectOutputStream(con.getOutputStream());
 				in = new ObjectInputStream(con.getInputStream());
 				
-				//Verbindung ausgeben
+				/*Verbindung ausgeben */
 				System.out.println("Connection von "+this.getName()+" zu "+remoteServerAddress+":"+serverPort+" aufgebaut");
 				
-				// Echo-Nachricht aufbauen
+				/*
+				 * Neues EchoPDU erzeugen
+				 * EchoPDU ClientName setzen
+				 * EchoPDU Nachricht setzen
+				 *  
+				 */
 				EchoPDU echoSend = new EchoPDU();
 				echoSend.setClientName(this.getName());
 				echoSend.setMessage(echoSend.getMessageText(this.messageLength)+(i+1));
 				
-				// Letzter Request?
+				/* Letzter Request? */
 				if (i == numberOfMessages - 1) {
 					echoSend.setLastRequest(true);
 				}
 				
-				// Senden der Nachricht an den Server				
+				/* Senden der Nachricht an den Server */			
 				out.writeObject(echoSend);
 				
-				// Antwort entgegennehmen
+				/* Antwort entgegennehmen */
 				EchoPDU echoRec = (EchoPDU)in.readObject();
 				
 				//System.out.println("Client "+this.getName()+": "+echoRec.getMessage()+" von "+echoRec.getServerThreadName());
 				
-				// RTT berechnen
+				/* RTT berechnen */
 				rtt = System.nanoTime() - rttStartTime;
 				
-				// Response-Zaehler erhoehen
+				/* Response-Zaehler erhoehen */
 				sharedData.incrSentMsgCounter(numberOfClient);
 				sharedData.incrReceivedMsgCounter(numberOfClient, rtt, echoRec.getServerTime());
  
-				// Transportverbindung abbauen
+				/* Transportverbindung abbauen */
 				out.close();
 				in.close();
 				con.close();
 				
 				
 				
-				// Denkzeit
+				/* Denkzeit */
 				try {
 					Thread.sleep(clientThinkTime);
 				} catch (InterruptedException e) {
@@ -184,7 +192,7 @@ public class TCPSingleThreadedEchoClientThread extends AbstractClientThread {
 			
 		}
 
-		// Statistikdaten des Clients ausgeben
+		/* Statistikdaten des Clients ausgeben */
 		// sharedData.printClientStatistic(numberOfClient);
 	}
 }

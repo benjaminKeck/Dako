@@ -17,42 +17,44 @@ import edu.hm.dako.EchoApplication.Basics.SharedClientStatistics;
 /**
  * Klasse RMIEchoClientThread
  *  
- * @author Mandl
+ * @author Benjamin Keckes
  *
  */
 public class RMIEchoClientThread extends AbstractClientThread
 {	 
 		private static Log log = LogFactory.getLog(RMIEchoClientThread.class);
 				
-	    // Name des Threads
+	    /** Name des Threads */
 	    private String threadName;
 	    
-	    // Nummer des Echo-Clients
+	    /** Nummer des Echo-Clients */
 	    private int numberOfClient;
 	    
-	    // Laenge einer Nachricht
+	    /** Laenge einer Nachricht */
 	    private int messageLength;
 	    
-	    // Anzahl zu sendender Nachrichten je Thread
+	    /** Anzahl zu sendender Nachrichten je Thread */
 	    private int numberOfMessages;
 	    
-	    // Adresse des Servers (String)
+	    /** Adresse des Servers (String) */
 	    private String remoteServerAddress;
 	    
-	    // Well-known Port der RMI Registry, derzeit nicht genutzt, 
-	    // da Standard verwendet wird
+	    /** Well-known Port der RMI Registry, derzeit nicht genutzt, 
+	     * da Standard verwendet wird
+	     * 
+	     */
 		private static int RMIRegistryPort = 1099;
 	    
-	    // RMI-Referenz auf den Server
+	    /** RMI-Referenz auf den Server */
 	    private RMIEchoServerInterface echoServer;
 	    
-	    // Denkzeit des Clients zwischen zwei Requests in ms
+	    /** Denkzeit des Clients zwischen zwei Requests in ms */
 	    private int clientThinkTime;
 	    	     
-	    // Gemeinsame Daten der Threads
+	    /** Gemeinsame Daten der Threads */
 	    private SharedClientStatistics sharedData;
 	  
-	    // Zeitstempel für RTT-Berechnung
+	    /** Zeitstempel fŸr RTT-Berechnung */
 		private long rttStartTime;
 		private long rtt;
 		
@@ -92,10 +94,10 @@ public class RMIEchoClientThread extends AbstractClientThread
 				
 				
 				try {
-					//Registry holen
+					/*Registry holen */
 					Registry rmiRegistry = LocateRegistry.getRegistry(remoteServerAddress, serverPort);
 					
-					//Registry erkennen
+					/*Registry erkennen */
 					echoServer = (RMIEchoServerInterface)rmiRegistry.lookup("Server");
 					System.out.println(this.getName()+": Verbindung mit echoServer");
 				}  catch (RemoteException e) {
@@ -110,13 +112,14 @@ public class RMIEchoClientThread extends AbstractClientThread
 		@Override
 		public void run() 
 		{   
-			//zähler inkrementieren
+			/*zähler inkrementieren */
 			sharedData.incrNumberOfLoggedInClients();
 			
 	        /**
 	         * Synchronisation mit allen anderen Client-Threads:
 	         * Warten, bis alle Clients angemeldet sind und dann
 	         * erst mit der Lasterzeugung beginnen
+	         * 
 	         */
 	        while (!sharedData.allClientsLoggedIn())
 	       	{
@@ -128,26 +131,34 @@ public class RMIEchoClientThread extends AbstractClientThread
 		        }
 	        }
 	        
-	        //Nachrichten hintereinander senden
+	        /*Nachrichten hintereinander senden */
 	        for(int i=0; i<numberOfMessages; i++){
-	        	
+	        	/* RTT-Startzeit ermitteln */
 	        	rttStartTime = System.nanoTime();
 	        	
+	        	/*
+				 * Neues EchoPDU erzeugen
+				 * EchoPDU ClientName setzen
+				 * EchoPDU Nachricht setzen
+				 *  
+				 */
 	        	EchoPDU send = new EchoPDU();
 				send.setClientName(this.getName());
 				send.setMessage(send.getMessageText(this.messageLength)+(i+1));
 				
+				/* Letzter Request? */
 				if(i>=numberOfMessages-1){
 					send.setLastRequest(true);
 				}
 				
 				try {
-					//senden echoPDU->Rückgabewert ist Antwort des Servers
+					/*senden echoPDU->Rückgabewert ist Antwort des Servers */
 					EchoPDU reply = echoServer.echo(send);
 					
-					// RTT berechnen
+					/* RTT berechnen */
 					rtt = System.nanoTime() - rttStartTime;
-					// Response-Zaehler erhoehen
+					
+					/* Response-Zaehler erhoehen */
 					sharedData.incrSentMsgCounter(numberOfClient);
 					sharedData.incrReceivedMsgCounter(numberOfClient, rtt, reply.getServerTime());
 					
@@ -157,7 +168,7 @@ public class RMIEchoClientThread extends AbstractClientThread
 					e.printStackTrace();
 				}
 				
-				//Wartezeit bevor die nächste Nachricht geschickt wird
+				/*Wartezeit bevor die nächste Nachricht geschickt wird */
 				try {
 					Thread.sleep(clientThinkTime);
 				} catch (InterruptedException e) {
@@ -165,7 +176,7 @@ public class RMIEchoClientThread extends AbstractClientThread
 				}	
 	        }
 	        
-	        //Ausgabe bei Threadende
+	        /*Ausgabe bei Threadende */
 	        System.out.println(this.getName()+": ist fertig");
 	        
 						

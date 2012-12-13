@@ -160,7 +160,7 @@ public class ReliableUdpServerSocket {
 			this.basisSocket = basisSocket;
 			this.unreliableSocket = basisSocket.unreliableSocket;
 			setName("LocalPortListener: " + unreliableSocket.getLocalPort());
-			System.out.println("bais: "+basisSocket.port+", unrSocket: "+unreliableSocket.getLocalPort());
+			//System.out.println("bais: "+basisSocket.port+", unrSocket: "+unreliableSocket.getLocalPort());
 		}
 
 		@Override

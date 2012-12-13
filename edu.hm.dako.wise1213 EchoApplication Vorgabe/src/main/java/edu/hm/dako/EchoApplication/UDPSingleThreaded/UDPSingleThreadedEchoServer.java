@@ -35,7 +35,7 @@ public class UDPSingleThreadedEchoServer extends Thread {
 	private static Map<String, String> connections = new ConcurrentHashMap<String, String>();
 
 	/**
-	 * Datagram-Socket des Servers (Listen-Socket)
+	 * UdpSocket des Servers
 	 */
 	private static UdpSocket serverSocket;
 
