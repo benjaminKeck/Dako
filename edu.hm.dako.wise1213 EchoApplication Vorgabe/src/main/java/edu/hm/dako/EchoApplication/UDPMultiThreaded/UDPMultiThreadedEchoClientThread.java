@@ -15,50 +15,50 @@ import edu.hm.dako.EchoApplication.Basics.SharedClientStatistics;
 /**
  * Klasse UDPMultiThreadedEchoClientThread
  * 
- * @author Mandl
+ * @author Thorben Knichwitz, Daniel Ostertag
  * 
  */
 public class UDPMultiThreadedEchoClientThread extends AbstractClientThread {
 	private static Log log = LogFactory
 			.getLog(UDPMultiThreadedEchoClientThread.class);
 
-	// Name des Threads
+	/** Name des Threads */
 	private String threadName;
 
-	// Nummer des Echo-Clients
+	/** Nummer des Echo-Clients */
 	private int numberOfClient;
 
-	// Laenge einer Nachricht
+	/** Laenge einer Nachricht */
 	private int messageLength;
 
-	// Anzahl zu sendender Nachrichten je Thread
+	/** Anzahl zu sendender Nachrichten je Thread */
 	private int numberOfMessages;
 
-	// Portnummer des Threads
+	/** Portnummer des Threads */
 	private int localPort;
 
-	// Serverport
+	/** Serverport */
 	private int serverPort;
 
-	// Adresse des Servers (String)
+	/** Adresse des Servers (String) */
 	private String remoteServerAddress;
 
-	// Inet-Address des Servers
+	/** Inet-Address des Servers */
 	private InetAddress remoteInetAddress;
 
-	// Denkzeit des Clients zwischen zwei Requests im ms
+	/** Denkzeit des Clients zwischen zwei Requests im ms */
 	private int clientThinkTime;
 
-	// Timeout für UDP-Receive
+	/** Timeout fŸr UDP-Receive */
 	private static final int receivingTimeout = 20000;
 
-	// Gemeinsame Daten der Threads
+	/** Gemeinsame Daten der Threads */
 	private SharedClientStatistics sharedData;
 
-	// Lokales Datagramm-Socket
+	/** Lokales Datagramm-Socket */
 	private UdpSocket con;
 
-	// Zeitstempel für RTT-Berechnung
+	/** Zeitstempel für RTT-Berechnung */
 	private long rttStartTime;
 	private long rtt;
 
@@ -104,7 +104,7 @@ public class UDPMultiThreadedEchoClientThread extends AbstractClientThread {
 		this.setName("EchoClient-".concat(String.valueOf(numberOfClient + 1)));
 		threadName = getName();
 
-		// UDP-Socket registrieren
+		/** UDP-Socket registrieren */
 		try {
 			con = new UdpSocket(localPort, 200000, 300000);
 			localPort = con.getLocalPort();
@@ -138,24 +138,33 @@ public class UDPMultiThreadedEchoClientThread extends AbstractClientThread {
 			}
 		}
 
+		/** 
+		 * ZŠhler fŸr jede reingekommene Message erhšhen
+		 * 
+		 */
 		for (int i = 0; i < numberOfMessages; i++) {
-			// RTT-Startzeit ermitteln
+			
+			/** RTT-Startzeit ermitteln */
 			rttStartTime = System.nanoTime();
 
 			try {
 
-				// Echo-Nachricht aufbauen
+				/**
+				 * Neues EchoPDU erzeugen
+				 * EchoPDU ClientName setzen
+				 * EchoPDU Nachricht setzen
+				 *  
+				 */
 				EchoPDU echoSend = new EchoPDU();
 				echoSend.setClientName(this.getName());
-				String message = "Laenge: " + messageLength;
-				echoSend.setMessage(message);
+				echoSend.setMessage(echoSend.getMessageText(this.messageLength));
 
-				// Letzter Request?
+				/** Letzter Request? */
 				if (i == numberOfMessages - 1) {
 					echoSend.setLastRequest(true);
 				}
 
-				// Das Echo an den Server senden
+				/** Das Echo an den Server senden */
 				con.send(InetAddress.getByName(remoteServerAddress),
 						serverPort, echoSend);
 
@@ -164,13 +173,13 @@ public class UDPMultiThreadedEchoClientThread extends AbstractClientThread {
 			}
 
 			try {
-				// Das Echo des Servers empfangen
+				/** Das Echo des Servers empfangen */
 				EchoPDU echoRec = (EchoPDU) con.receive(receivingTimeout);
 
-				// RTT berechnen
+				/** RTT auswerten */
 				rtt = System.nanoTime() - rttStartTime;
 
-				// Response-Zaehler erhoehen
+				/** Response-Zaehler erhoehen */
 				sharedData.incrSentMsgCounter(numberOfClient);
 				if (echoRec != null)
 				sharedData.incrReceivedMsgCounter(numberOfClient, rtt,
@@ -179,7 +188,7 @@ public class UDPMultiThreadedEchoClientThread extends AbstractClientThread {
 				System.out.println(ioe);
 			}
 
-			// Wartezeit
+			/** Wartezeit */
 			try {
 				Thread.sleep(clientThinkTime);
 			} catch (InterruptedException e) {
@@ -188,10 +197,10 @@ public class UDPMultiThreadedEchoClientThread extends AbstractClientThread {
 
 		}
 		
-		// Statistik ausgeben
+		/** Statistik ausgeben */
 		sharedData.printClientStatistic(numberOfClient);
 		
-		// Socket schlie§en
+		/** Socket schlie§en */
 		con.close();
 
 	}

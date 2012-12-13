@@ -13,51 +13,63 @@ import org.apache.log4j.PropertyConfigurator;
 
 import edu.hm.dako.EchoApplication.Basics.EchoPDU;
 
+
 /**
- * Klasse UDPMultiThreadedEchoServer
- * 
- * @author Mandl
- * 
+ * Klasse UDPMultiThreadedEchoServer.
+ *
+ * @author Thorben Knichwitz, Daniel Ostertag
  */
 public class UDPMultiThreadedEchoServer extends Thread {
+	
+	/** Der Logfile */
 	private static Log log = LogFactory
 			.getLog(UDPMultiThreadedEchoServer.class);
 
+	/** ServerPort */
 	private static int serverPort = 50000;
 
-	// Verbindungstabelle: Hier werden alle aktiven Verbindungen zu Clients
-	// verwaltet
+
+	/** Verbindungstabelle: Hier werden alle aktiven Verbindungen zu Clients verwaltet */
 	private static Map<String, String> connections = new ConcurrentHashMap<String, String>();
 
-	// Datagram-Socket des Servers (Listen-Socket)
+	/**  Datagram-Socket des Servers (Listen-Socket) */
 	private static UdpSocket serverSocket;
 
-	// Timeout f¸r UDP-Receive
+	/** Timeout für UDP-Receive */
 	private static final int receivingTimeout = 20000;
 
+	/** UDPRemoteObject */
 	private UdpRemoteObject pdu = null;
-
+	
 	private static int numberOfWorkerThread = 0;
 
+	/** Die Startzeit zur Messung der Serverzeit */
 	long startTime;
 
 	/**
-	 * Konstruktor
+	 * Konstruktor.
+	 *
+	 * @param receivedPdu the received pdu
 	 */
 	public UDPMultiThreadedEchoServer(UdpRemoteObject receivedPdu) {
 		pdu = receivedPdu;
 	}
 
 	/**
-	 * main
-	 * 
-	 * @param args
+	 * main.
+	 *
+	 * @param args the arguments
 	 */
 	public static void main(String args[]) {
 		PropertyConfigurator.configureAndWatch("log4j.server.properties",
 				60 * 1000);
 
-		// TODO UDP-Serversocket registrieren
+		/**
+		 * UDP-Serversocket registrieren
+		 * 200000 SendBufferSize
+		 * 300000 SendBufferSize
+		 * 
+		 */
 		try {
 
 			serverSocket = new UdpSocket(serverPort, 200000, 300000);
@@ -68,28 +80,48 @@ public class UDPMultiThreadedEchoServer extends Thread {
 			System.exit(9);
 		}
 
+		/**
+		 * EchoPDU wird initialisiert
+		 * Bedingung für die Endlosschleife wird initialisiert
+		 * 
+		 */
 		EchoPDU receivedPdu = null;
 		boolean finished = false;
 
 		while (!finished) {
-			// Auf ankommende Verbindungsaufbauwuensche warten und diese
-			// in eigenen Threads bearbeiten
+			
+			/**
+			 * Auf ankommende Verbindungsaufbauwuensche warten und diese
+			 * in eigenen Threads bearbeiten
+			 *  
+			 */
 
 			try {
-				// Verbindung und EchoPDU entgegennehmen
+				
+				/**
+				 * Verbindung und EchoPDU entgegennehmen
+				 *  
+				 */
 				receivedPdu = (EchoPDU) serverSocket.receive(receivingTimeout);
 
-				// Neues RemoteObject anlegen
+				/**
+				 * Neues RemoteObject anlegen
+				 *  
+				 */
 				UdpRemoteObject receivedRemoteObject = new UdpRemoteObject(
 						serverSocket.getRemoteAddress(),
 						serverSocket.getRemotePort(), receivedPdu);
 
-				// Wenn das erhaltene PDU nicht leer war erzeuge einen neuen
-				// serverThread
+				
+				/**
+				 * Wenn das erhaltene PDU nicht leer war erzeuge einen neuen serverThread
+				 * Erhöhe die Anzahl der Threads
+				 * Starte den Thread
+				 *  
+				 */
 				if (receivedPdu != null) {
 
-					UDPMultiThreadedEchoServer serverThread = new UDPMultiThreadedEchoServer(
-							receivedRemoteObject);
+					UDPMultiThreadedEchoServer serverThread = new UDPMultiThreadedEchoServer(receivedRemoteObject);
 
 					numberOfWorkerThread++;
 
@@ -98,59 +130,77 @@ public class UDPMultiThreadedEchoServer extends Thread {
 				}
 
 			} catch (IOException e) {
-				// e.printStackTrace();
 
 				finished = true;
-				break;
 
 			}
 
 		}
 
-		// serverSocket.close();
+
 
 	}
 
 	/**
-	 * Worker-Thread-Methode fuer die Bearbeitung eines Clients
+	 * Worker-Thread-Methode fuer die Bearbeitung eines Clients.
 	 */
 
 	public void run() {
 
-		boolean finished = false;
+		
 
 		try {
+			
+			/**
+			 * EchoPDU aus dem RemoteObjekt holen
+			 *  
+			 */
 			EchoPDU echoPdu = (EchoPDU) pdu.getObject();
-
+			
+			/**
+			 * WorkerThread Namen zuweisen
+			 *  
+			 */
 			setName("WorkerThread-" + echoPdu.getClientName());
 
-			System.out.println(this.getName()
-					+ ": WorkerThread uebernimmt Request von "
-					+ echoPdu.getClientName());
+			System.out.println(this.getName() + ": WorkerThread uebernimmt Request von " + echoPdu.getClientName());
 
+			/**
+			 * Startzeit initialisieren
+			 *  
+			 */
 			long startTime = System.nanoTime();
 
-			// Echo an den Client senden
+			/**
+			 * Neues EchoPDU erzeugen
+			 * EchoPDU ServerThreadName setzen
+			 * EchoPDU ClientName setzen
+			 * EchoPDU Nachricht setzen
+			 * EchoPDU ServerZeit setzen
+			 *  
+			 */
 			EchoPDU echoSend = new EchoPDU();
 			log.debug("Serverzeit: " + (System.nanoTime() - startTime) + " ns");
 			echoSend.setServerThreadName(this.getName());
 			echoSend.setClientName(echoPdu.getClientName());
-			echoSend.setMessage(echoPdu.getMessage() + "_vomServerZurueck");
+			echoSend.setMessage(echoPdu.getMessage() + "_S");
 			echoSend.setServerTime(System.nanoTime() - startTime);
 
-			// Connection in die Liste eintragen
+			/** Connection in die Liste eintragen */
 			connections.put(echoPdu.getClientName(),
 					serverSocket.getLocalAddress());
-
+			
+			/** 
+			 * Wenn die letzte Nachricht eingetroffen ist, dann lösche die Verbindung aus der Map
+			 */
 			if (echoPdu.getLastRequest()) {
-				System.out.println("Letzter Request des Clients "
-						+ echoPdu.getClientName());
-
-				// Verbindung wird aus der Liste gelöscht
+				System.out.println("Letzter Request des Clients " + echoPdu.getClientName());
+				
 				connections.remove(this.getName());
 
 			}
 
+			/** Sende die Neue Nachricht an den Client zurück */
 			serverSocket.send(pdu.getRemoteAddress(), pdu.getRemotePort(),
 					echoSend);
 
@@ -159,22 +209,18 @@ public class UDPMultiThreadedEchoServer extends Thread {
 			e.printStackTrace();
 		}
 
-		// Kurz warten
+		/** Kurze Wartezeit */
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e3) {
 		}
 
-		System.out.println(this.getName()
-				+ ": Verbindung mit Client abbauen, Remote-UDP-Port "
-				+ pdu.getRemotePort());
-
-		log.debug(this.getName() + " beendet sich");
-		System.out.println(this.getName() + " beendet sich");
-
-		// Wenn nun in Der Verbindungsliste kein Eintrag mehr vorhanden ist
-		// bedeutet das das dies der letzte Thread ist und nun keiner mehr
-		// kommt.
+		/**
+		 * Wenn nun in Der Verbindungsliste kein Eintrag mehr vorhanden ist
+		 * bedeutet das das dies der letzte Thread ist und nun keiner mehr
+		 * kommt.
+		 *  
+		 */
 		if (connections.isEmpty()) {
 			System.out.println("alle ServerThreads fertig");
 
