@@ -90,30 +90,27 @@ public class RMIEchoClientThread extends AbstractClientThread
 			    this.setName("RMIEchoClient-".concat(String.valueOf(numberOfClient+1)));    
 				threadName = getName();
 				
-
-			    //TODO: Lookup
+				
 				try {
+					//Registry holen
 					Registry rmiRegistry = LocateRegistry.getRegistry(remoteServerAddress, serverPort);
-					//echoServer = (RMIEchoServerInterface)Naming.lookup("Server");
 					
+					//Registry erkennen
 					echoServer = (RMIEchoServerInterface)rmiRegistry.lookup("Server");
 					System.out.println(this.getName()+": Verbindung mit echoServer");
 				}  catch (RemoteException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				} catch (NotBoundException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
-				} /*catch (MalformedURLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}*/
+				}
 			}
 	
 		@Override
 		public void run() 
 		{   
-			
+			//zähler inkrementieren
 			sharedData.incrNumberOfLoggedInClients();
 			
 	        /**
@@ -131,6 +128,7 @@ public class RMIEchoClientThread extends AbstractClientThread
 		        }
 	        }
 	        
+	        //Nachrichten hintereinander senden
 	        for(int i=0; i<numberOfMessages; i++){
 	        	
 	        	rttStartTime = System.nanoTime();
@@ -144,7 +142,7 @@ public class RMIEchoClientThread extends AbstractClientThread
 				}
 				
 				try {
-					//senden und empfangen gleichzeitig
+					//senden echoPDU->Rückgabewert ist Antwort des Servers
 					EchoPDU reply = echoServer.echo(send);
 					
 					// RTT berechnen
@@ -158,7 +156,8 @@ public class RMIEchoClientThread extends AbstractClientThread
 				} catch (RemoteException e) {
 					e.printStackTrace();
 				}
-				//Wartezeit
+				
+				//Wartezeit bevor die nächste Nachricht geschickt wird
 				try {
 					Thread.sleep(clientThinkTime);
 				} catch (InterruptedException e) {
@@ -166,6 +165,7 @@ public class RMIEchoClientThread extends AbstractClientThread
 				}	
 	        }
 	        
+	        //Ausgabe bei Threadende
 	        System.out.println(this.getName()+": ist fertig");
 	        
 						

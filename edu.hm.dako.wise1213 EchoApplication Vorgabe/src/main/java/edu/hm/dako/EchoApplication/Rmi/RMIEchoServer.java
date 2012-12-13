@@ -57,8 +57,10 @@ public class RMIEchoServer
    	    	System.exit(1);
    	    }
    	 try {
-			
+			//Kommunikationsobjekt definieren
    		 	RMIEchoServerImpl obj = new RMIEchoServerImpl();
+   		 	
+   		 	//Kommunikationsobjekt an Server binden
 			rmiRegistry.rebind("Server",obj);
 	    	System.out.println("binding abgeschlossen");
 	  
