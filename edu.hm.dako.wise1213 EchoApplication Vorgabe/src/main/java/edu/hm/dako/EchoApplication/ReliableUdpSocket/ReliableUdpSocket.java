@@ -55,12 +55,13 @@ public class ReliableUdpSocket {
 				while (status != ConnectionStatus.CLOSED) {
 					// TODO
 					Object obj = data.poll(100, TimeUnit.MILLISECONDS);
+				//	System.out.println("polling...");
 					if(obj==null)
 						continue;
-					
-					
+					System.out.println("POLLING hat funktioniert");
+					status = ConnectionStatus.CLOSED;
 					outputStreamAnDieObereSchicht.writeObject(obj);
-					outputStreamAnDieObereSchicht.flush();
+					//outputStreamAnDieObereSchicht.flush();
 					//inputStreamVonDerOberenSchicht=inputStreamDerOberenSchicht.read();
 					//System.out.println("Connection offen");
 				}
@@ -101,13 +102,13 @@ public class ReliableUdpSocket {
 				while (status != ConnectionStatus.CLOSED) {
 					System.out.println("DataSender");
 					Object o = inputStreamVonDerOberenSchicht.readObject();
-					if(o==null)
-						continue;
+					//if(o==null)
+					//	continue;
 					
 					// Warte bis wieder gesendet werden darf
 					int maxWait=50;
 					while(status==ConnectionStatus.SENDING && maxWait>0){
-						this.wait(10);
+						this.wait(50);
 						maxWait--;
 					}
 					// TODO
@@ -115,12 +116,15 @@ public class ReliableUdpSocket {
 					
 					rObj.setData(o);
 					rObj.setId(currentOutgoingId++);
+					//rObj.setAck(true);
+					//System.out.println("LL: "+currentOutgoingId);
 					// versenden der Nachricht mit Sendewiederholung
 					// TODO
 					
 					//for(int i=0; i<3; i++){
-						sendIt(remoteAddress, remotePort, rObj);
 						
+						sendIt(remoteAddress, remotePort, rObj);
+						//status = ConnectionStatus.CLOSED;
 						//warte kurz
 						//this.wait(100);
 					//}
@@ -189,7 +193,7 @@ public class ReliableUdpSocket {
 							e.printStackTrace();
 						}
 						*/
-						System.out.println("data: "+((EchoPDU)reveivedPdu.getData()).getMessage());
+						System.out.println("empfangen data: "+((EchoPDU)reveivedPdu.getData()).getMessage());
 						data.add(reveivedPdu.getData());
 					}
 					else{
@@ -341,12 +345,13 @@ public class ReliableUdpSocket {
 		this.remotePort = serverPort;
 
 		//TODO
-		//Integer port = 5100;
-		while(ReliableUdpServerSocket.aktivePortsUndDerenListener.containsKey(++this.remotePort)){
+		Integer port = 5100;
+		while(ReliableUdpServerSocket.aktivePortsUndDerenListener.containsKey(port++)){
 			
 		}
+		//ReliableUdpServerSocket.aktivePortsUndDerenListener.put(key, value)
 		//verwendeterBasisSocket = socket.
-		verwendeterBasisSocket = new ReliableUdpServerSocket(this.remotePort);
+		verwendeterBasisSocket = new ReliableUdpServerSocket(port);
 	//	System.out.println("verwendeterBasisSocketport: "+verwendeterBasisSocket.port);
 		//status = ConnectionStatus.WAITING;
 		socket = verwendeterBasisSocket.unreliableSocket;
@@ -428,6 +433,7 @@ public class ReliableUdpSocket {
 	 */
 	public void sendIt(InetAddress remoteAddress, int remotePort, Object pdu)
 			throws IOException {
+		System.out.println("sende an: "+remoteAddress+" : "+remotePort);
 		socket.send(remoteAddress, remotePort, pdu);
 	}
 

@@ -148,8 +148,8 @@ public class ReliableUdpMultiThreadedEchoServer extends Thread {
 				sendPdu.setServerTime(System.nanoTime() - startTime);
 
 				out.writeObject(sendPdu);
-				out.flush();
-				log.debug("Response gesendet");
+				//out.flush();
+				//log.debug("Response gesendet");
 			} catch (IOException e) {
 				log.error("Senden einer Nachricht nicht moeglich: " + e);
 				finished = true;

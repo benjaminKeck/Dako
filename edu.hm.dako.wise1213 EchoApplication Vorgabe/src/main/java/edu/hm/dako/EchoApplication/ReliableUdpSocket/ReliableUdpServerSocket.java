@@ -72,7 +72,7 @@ public class ReliableUdpServerSocket {
 			throw new SocketException("Port is already in use");
 		}
 		this.port = localPort;
-		unreliableSocket = new UnreliableUdpSocket(port, 200000, 500000);
+		unreliableSocket = new UnreliableUdpSocket(this.port, 200000, 500000);
 		LocalPortListener sl = new LocalPortListener(this);
 		sl.start();
 		aktivePortsUndDerenListener.put(localPort, sl);
@@ -160,22 +160,26 @@ public class ReliableUdpServerSocket {
 			this.basisSocket = basisSocket;
 			this.unreliableSocket = basisSocket.unreliableSocket;
 			setName("LocalPortListener: " + unreliableSocket.getLocalPort());
+			System.out.println("bais: "+basisSocket.port+", unrSocket: "+unreliableSocket.getLocalPort());
 		}
 
 		@Override
 		public void run() {
 			while (!isInterrupted()) {
 				try {
+					
 					ReliableUdpObject receivedPDU = (ReliableUdpObject) unreliableSocket.receive(100);
+					//System.out.println("Am Port "+unreliableSocket.getLocalPort()+" empfangen");
 					// TODO
 										
 					String remoteAdress = ""+unreliableSocket.getRemoteAddress();
 					int remotePort = unreliableSocket.getRemotePort();
 					remoteAdress = remoteAdress.substring(1);
 					
-					//System.out.println("remoteAdress: "+remoteAdress+", port: "+remotePort);
+					System.out.println("remoteAdress: "+remoteAdress+", port: "+remotePort);
 					
-					ReliableUdpSocket s = new ReliableUdpSocket(remoteAdress, remotePort);
+					
+					ReliableUdpSocket s = new ReliableUdpSocket(this.basisSocket, InetAddress.getByName(remoteAdress), remotePort);
 					
 					//receivedPDU.setAck(true);
 					s.process(receivedPDU);
@@ -186,7 +190,7 @@ public class ReliableUdpServerSocket {
 					if(!waitingSockets.contains(s))
 						waitingSockets.add(s);
 					
-					System.out.println("M: "+((EchoPDU)receivedPDU.getData()).getMessage());
+					//System.out.println("M: "+((EchoPDU)receivedPDU.getData()).getMessage());
 					//waitingSockets.add(((EchoPDU)receivedPDU).getServerThreadName());
 					//reliableSockets.
 					//waitingSockets.add(new ReliableUdpSocket(receivedPDU., serverPort))
