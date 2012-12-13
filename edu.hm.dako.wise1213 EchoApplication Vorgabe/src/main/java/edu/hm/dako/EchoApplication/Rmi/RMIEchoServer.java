@@ -46,7 +46,9 @@ public class RMIEchoServer
 		
    	    // RMI Registry lokal starten
    	    try {
-   	    	rmiRegistry = java.rmi.registry.LocateRegistry.createRegistry(1099);
+   	    	rmiRegistry = java.rmi.registry.LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
+   	    	
+   	    	//rmiRegistry.rebind("Server", rmiRegistry);
    	    	System.out.println("RMI registry bereit und wartet");
    	    	log.debug("RMI registry bereit");
    	    } catch (Exception e) {
@@ -63,8 +65,9 @@ public class RMIEchoServer
 			
    		 	RMIEchoServerImpl obj = new RMIEchoServerImpl();
 			rmiRegistry.rebind("Server",obj);
-//	    	RemoteServer.setLog(System.out);
-	    	
+			//Naming.rebind("Server", new RMIEchoServer());
+	    	//RemoteServer.setLog(System.out);
+	    	System.out.println("binding abgeschlossen");
 	  
 		} catch (RemoteException e) {
 			// TODO Auto-generated catch block

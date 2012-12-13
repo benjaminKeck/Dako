@@ -66,6 +66,7 @@ public class RMIEchoClientThread extends AbstractClientThread
 	     * @param numberOfMessages: Anzahl zu sendender Nachrichten je Thread
 	     * @param clientThinkTime: Denkzeit des Test-Clients
 	     * @param sharedData: Gemeinsame Daten der Threads 
+	     * @throws MalformedURLException 
 	     */
 		
 		@Override
@@ -93,18 +94,20 @@ public class RMIEchoClientThread extends AbstractClientThread
 			    //TODO: Lookup
 				try {
 					Registry rmiRegistry = LocateRegistry.getRegistry(remoteServerAddress, serverPort);
-					echoServer = (RMIEchoServerInterface)Naming.lookup("Server");
+					//echoServer = (RMIEchoServerInterface)Naming.lookup("Server");
+					
+					echoServer = (RMIEchoServerInterface)rmiRegistry.lookup("Server");
 					System.out.println(this.getName()+": Verbindung mit echoServer");
-				} catch (MalformedURLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (RemoteException e) {
+				}  catch (RemoteException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (NotBoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
-				}
+				} /*catch (MalformedURLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}*/
 			}
 	
 		@Override
