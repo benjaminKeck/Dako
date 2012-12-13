@@ -54,8 +54,6 @@ import edu.hm.dako.EchoApplication.Basics.EchoPDU;
    	    //Servername setzen
    	    sendPdu.setServerThreadName(message.getServerThreadName());
    	    
-   	    //Serverzeit eintragen
-   	    sendPdu.setServerTime(System.nanoTime() - startTime);
    	    
    	    //Wenn es die letzte Nachricht ist
    	    if(sendPdu.getLastRequest()){
@@ -71,8 +69,13 @@ import edu.hm.dako.EchoApplication.Basics.EchoPDU;
    	    	}
    	    	
    	    }
-		
-	   	 return sendPdu;  
+   	   
+   	    //System.out.println("serverzeit: "+(System.nanoTime() - startTime));
+   	    //Serverzeit eintragen
+   	    sendPdu.setServerTime(System.nanoTime() - startTime);
+   	    
+   	    //zurück an den Client
+	   	return sendPdu;  
 	}
 	
 	
