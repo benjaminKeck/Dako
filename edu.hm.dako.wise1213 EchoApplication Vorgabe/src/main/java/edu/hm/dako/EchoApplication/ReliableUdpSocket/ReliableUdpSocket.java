@@ -52,15 +52,21 @@ public class ReliableUdpSocket {
 			try {
 				outputStreamAnDieObereSchicht = new ObjectOutputStream(pipedOut);
 				outputStreamAnDieObereSchicht.flush();
+				
+				
 				while (status != ConnectionStatus.CLOSED) {
 					// TODO
 					Object obj = data.poll(100, TimeUnit.MILLISECONDS);
-				//	System.out.println("polling...");
+					System.out.println("polling...");
+					//status = ConnectionStatus.CLOSED;
 					if(obj==null)
 						continue;
+					
 					System.out.println("POLLING hat funktioniert");
 					status = ConnectionStatus.CLOSED;
 					outputStreamAnDieObereSchicht.writeObject(obj);
+					outputStreamAnDieObereSchicht.flush();
+					
 					//outputStreamAnDieObereSchicht.flush();
 					//inputStreamVonDerOberenSchicht=inputStreamDerOberenSchicht.read();
 					//System.out.println("Connection offen");
@@ -108,7 +114,7 @@ public class ReliableUdpSocket {
 					// Warte bis wieder gesendet werden darf
 					int maxWait=50;
 					while(status==ConnectionStatus.SENDING && maxWait>0){
-						this.wait(50);
+						this.sleep(20);
 						maxWait--;
 					}
 					// TODO
@@ -121,13 +127,13 @@ public class ReliableUdpSocket {
 					// versenden der Nachricht mit Sendewiederholung
 					// TODO
 					
-					//for(int i=0; i<3; i++){
+					for(int i=0; i<3 && status==ConnectionStatus.SENDING; i++){
 						
 						sendIt(remoteAddress, remotePort, rObj);
 						//status = ConnectionStatus.CLOSED;
 						//warte kurz
-						//this.wait(100);
-					//}
+						this.sleep(100);
+					}
 					//outputStreamAnDieObereSchicht.writeObject(o);
 					
 					
@@ -181,23 +187,25 @@ public class ReliableUdpSocket {
 						waitTillConnectionIsAccepted(reveivedPdu);
 						ReliableUdpObject rObj = new ReliableUdpObject();
 						rObj.setAck(true);
-						rObj.setId(currentOutgoingId);
-						currentOutgoingId++;
+						rObj.setId(lastIncomingId);
+						//rObj.setData(reveivedPdu);
+						//currentOutgoingId++;
 						
 						//ANTWORT zurück senden
-						/*
+						
 						try{
 							sendIt(remoteAddress, remotePort, rObj);
 						}
 						catch(IOException e){
 							e.printStackTrace();
 						}
-						*/
+						
 						System.out.println("empfangen data: "+((EchoPDU)reveivedPdu.getData()).getMessage());
 						data.add(reveivedPdu.getData());
 					}
 					else{
-						System.out.println("kein ack");
+						//data.add(reveivedPdu.getData());
+						System.out.println("ack");
 						status = ConnectionStatus.READY_TO_SEND;
 					}
 					
@@ -448,6 +456,7 @@ public class ReliableUdpSocket {
 		// TODO
 		//socket.close();
 		status = ConnectionStatus.CLOSED;
+		verwendeterBasisSocket.shutdownReliableUdpSocket(this);
 	}
 
 	/**

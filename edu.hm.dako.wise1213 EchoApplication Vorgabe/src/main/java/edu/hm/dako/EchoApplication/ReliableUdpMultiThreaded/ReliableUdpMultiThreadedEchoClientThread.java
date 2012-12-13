@@ -172,11 +172,11 @@ public class ReliableUdpMultiThreadedEchoClientThread extends
 				e1.printStackTrace();
 			} 
 			
-			/*
+			
 			try{
 				// Antwort entgegennehmen
 				EchoPDU echoRec = (EchoPDU) in.readObject();
-				System.out.println("Client "+this.getName()+": "+echoRec.getMessage()+" von "+echoRec.getServerThreadName());
+				//System.out.println("Client "+this.getName()+": "+echoRec.getMessage()+" von "+echoRec.getServerThreadName());
 				// RTT berechnen
 				rtt = System.nanoTime() - rttStartTime;
 				// Response-Zaehler erhoehen
@@ -189,7 +189,7 @@ public class ReliableUdpMultiThreadedEchoClientThread extends
 				System.out.println("Fehler in Typkonvertierung");
 				e.printStackTrace();
 			} 
-			*/
+			
 			//Wartezeit
 			try {
 				Thread.sleep(clientThinkTime);

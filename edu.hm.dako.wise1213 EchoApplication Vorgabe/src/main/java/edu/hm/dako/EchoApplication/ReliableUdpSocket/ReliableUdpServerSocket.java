@@ -171,7 +171,17 @@ public class ReliableUdpServerSocket {
 					ReliableUdpObject receivedPDU = (ReliableUdpObject) unreliableSocket.receive(100);
 					//System.out.println("Am Port "+unreliableSocket.getLocalPort()+" empfangen");
 					// TODO
-										
+					
+					if(reliableSockets.containsKey(generateConnectionString())){
+						reliableSockets.get(generateConnectionString()).process(receivedPDU);
+					}
+					else{
+						ReliableUdpSocket con = new ReliableUdpSocket(basisSocket, unreliableSocket.getRemoteAddress(), unreliableSocket.getRemotePort());
+						waitingSockets.add(con);
+						con.process(receivedPDU);
+					}
+					
+					/*
 					String remoteAdress = ""+unreliableSocket.getRemoteAddress();
 					int remotePort = unreliableSocket.getRemotePort();
 					remoteAdress = remoteAdress.substring(1);
@@ -194,7 +204,7 @@ public class ReliableUdpServerSocket {
 					//waitingSockets.add(((EchoPDU)receivedPDU).getServerThreadName());
 					//reliableSockets.
 					//waitingSockets.add(new ReliableUdpSocket(receivedPDU., serverPort))
-					
+					*/
 					
 
 				} catch (SocketTimeoutException e) {
