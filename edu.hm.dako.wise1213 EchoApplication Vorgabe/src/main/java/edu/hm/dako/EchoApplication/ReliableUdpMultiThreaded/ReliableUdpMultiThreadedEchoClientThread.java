@@ -103,13 +103,13 @@ public class ReliableUdpMultiThreadedEchoClientThread extends
 		try {
 			System.out.println(this.getName()+": ReliableUdpSocket erstellen ("+remoteServerAddress+", "+serverPort+")");
 			con = new ReliableUdpSocket(remoteServerAddress, serverPort);
-		     out = new ObjectOutputStream(con.getOutputStream());
-		     in = new ObjectInputStream(con.getInputStream());
-		      localPort = con.getLocalPort();
-		      currentPort = con.getPort();
-		      log.debug(threadName + ": Verbindung zum Server aufgebaut mit Port " + localPort);
-			  log.debug(threadName + ": Registrierter Port: " + currentPort);    	
-			  System.out.println("Verbindung mit LocalPort: "+localPort+" und currentPort: "+currentPort+" am serverPort: "+serverPort);
+		    out = new ObjectOutputStream(con.getOutputStream());
+		    in = new ObjectInputStream(con.getInputStream());
+		    localPort = con.getLocalPort();
+		    currentPort = con.getPort();
+		    log.debug(threadName + ": Verbindung zum Server aufgebaut mit Port " + localPort);
+		    log.debug(threadName + ": Registrierter Port: " + currentPort);    	
+		    System.out.println("Verbindung mit LocalPort: "+localPort+" und currentPort: "+currentPort+" am serverPort: "+serverPort);
         } 
 	    catch (Exception e) 
         {         
@@ -160,10 +160,13 @@ public class ReliableUdpMultiThreadedEchoClientThread extends
 				//Message wird gesendet
 				//out.writeObject(echoSend);
 				//out.flush();
+				out.writeObject(echoSend);
+				/*
 				ReliableUdpObject obj = new ReliableUdpObject();
 				obj.setData(echoSend);
 				obj.setId(numberOfClient);
 				con.sendIt(InetAddress.getByName(remoteServerAddress), serverPort, obj);
+				*/
 			}
 			catch (IOException e1) {		
 				e1.printStackTrace();

@@ -177,7 +177,7 @@ public class ReliableUdpServerSocket {
 					
 					ReliableUdpSocket s = new ReliableUdpSocket(remoteAdress, remotePort);
 					
-					receivedPDU.setAck(true);
+					//receivedPDU.setAck(true);
 					s.process(receivedPDU);
 					
 					s.accept();

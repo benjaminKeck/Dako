@@ -99,11 +99,15 @@ public class ReliableUdpSocket {
 				
 				
 				while (status != ConnectionStatus.CLOSED) {
+					System.out.println("DataSender");
 					Object o = inputStreamVonDerOberenSchicht.readObject();
+					if(o==null)
+						continue;
+					
 					// Warte bis wieder gesendet werden darf
 					int maxWait=50;
 					while(status==ConnectionStatus.SENDING && maxWait>0){
-						this.wait(30);
+						this.wait(10);
 						maxWait--;
 					}
 					// TODO
@@ -114,12 +118,14 @@ public class ReliableUdpSocket {
 					// versenden der Nachricht mit Sendewiederholung
 					// TODO
 					
-					for(int i=0; i<3; i++){
+					//for(int i=0; i<3; i++){
 						sendIt(remoteAddress, remotePort, rObj);
 						
-						this.wait(100);
-					}
+						//warte kurz
+						//this.wait(100);
+					//}
 					//outputStreamAnDieObereSchicht.writeObject(o);
+					
 					
 				}
 
@@ -129,7 +135,6 @@ public class ReliableUdpSocket {
 				if (status != ConnectionStatus.CLOSED)
 					log.error(e);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} finally {
 				try {
@@ -152,14 +157,14 @@ public class ReliableUdpSocket {
 		public ReceivedPacketProcessorThread() {
 			setName("ReceivedPacketProcessorThread: " + getLocalPort());
 			System.out.println("ReceivedPacketProcessorThread: " + getLocalPort());
+			status = ConnectionStatus.READY_TO_SEND;
 		}
 
 		@Override
 		public void run() {
-			
 			try {
 				while (status != ConnectionStatus.CLOSED) {
-					System.out.println("ReceivedPacketProcessorThread.......");
+					//System.out.println("ReceivedPacketProcessorThread.......");
 					ReliableUdpObject reveivedPdu = receivedPackets.poll(100,
 							TimeUnit.MILLISECONDS);
 					if (reveivedPdu == null)
@@ -175,19 +180,22 @@ public class ReliableUdpSocket {
 						rObj.setId(currentOutgoingId);
 						currentOutgoingId++;
 						
+						//ANTWORT zurück senden
+						/*
 						try{
 							sendIt(remoteAddress, remotePort, rObj);
 						}
 						catch(IOException e){
 							e.printStackTrace();
 						}
-						
+						*/
 						System.out.println("data: "+((EchoPDU)reveivedPdu.getData()).getMessage());
 						data.add(reveivedPdu.getData());
 					}
-					else
+					else{
+						System.out.println("kein ack");
 						status = ConnectionStatus.READY_TO_SEND;
-					
+					}
 					
 					//EchoPDU rec = (EchoPDU)reveivedPdu.getData();
 					
@@ -511,6 +519,7 @@ public class ReliableUdpSocket {
 	 */
 	protected void process(ReliableUdpObject receivedPdu) {
 		receivedPackets.add(receivedPdu);
+		//status = ConnectionStatus.WAITING;
 		System.out.println("receivedPdu empfangen");
 	}
 

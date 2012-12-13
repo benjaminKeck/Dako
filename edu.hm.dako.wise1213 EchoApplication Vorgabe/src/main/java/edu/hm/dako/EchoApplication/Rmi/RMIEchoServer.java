@@ -28,7 +28,7 @@ import edu.hm.dako.EchoApplication.Basics.EchoPDU;
 	 * 
 	 * @author Mandl
 	 * 
-	 * TODO: -Djava.rmi.server.codebase= ueberarbeiten!
+	 * @author Benjamin Keckes
 	 */
 public class RMIEchoServer
 {

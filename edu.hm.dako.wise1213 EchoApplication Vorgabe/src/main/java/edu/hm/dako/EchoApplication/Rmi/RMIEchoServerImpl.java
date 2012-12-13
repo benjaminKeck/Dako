@@ -17,6 +17,7 @@ import edu.hm.dako.EchoApplication.Basics.EchoPDU;
 /**
  * Klasse RMIEchoServerImpl
  * @author Mandl
+ * @author Benjamin Keckes
  */
  public class RMIEchoServerImpl extends UnicastRemoteObject implements RMIEchoServerInterface 
 {	 
