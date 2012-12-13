@@ -172,9 +172,12 @@ public class ReliableUdpServerSocket {
 					String remoteAdress = ""+unreliableSocket.getRemoteAddress();
 					int remotePort = unreliableSocket.getRemotePort();
 					remoteAdress = remoteAdress.substring(1);
+					
 					//System.out.println("remoteAdress: "+remoteAdress+", port: "+remotePort);
 					
 					ReliableUdpSocket s = new ReliableUdpSocket(remoteAdress, remotePort);
+					
+					receivedPDU.setAck(true);
 					s.process(receivedPDU);
 					
 					s.accept();
@@ -188,7 +191,7 @@ public class ReliableUdpServerSocket {
 					//reliableSockets.
 					//waitingSockets.add(new ReliableUdpSocket(receivedPDU., serverPort))
 					
-					receivedPDU.setAck(true);
+					
 
 				} catch (SocketTimeoutException e) {
 					// Der Timeout ist abgelaufen, einfach nochmal versuchen

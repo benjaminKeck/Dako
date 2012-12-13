@@ -58,7 +58,7 @@ public class TCPMultiThreadedEchoServer extends Thread
 		        System.out.println("Verbindung angelegt: "+incoming.getPort()); 
 		      }  
 		      catch (Exception e) { 
-		    	  //TODO
+		    	  e.printStackTrace();
 		      }
 		}
 
