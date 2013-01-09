@@ -226,3 +226,12 @@ Variation der Threadanzahl, Multi-threaded ReliableUdp, 1, 0, 0, 999, 0, 2, 0, 0
 Variation der Threadanzahl, Multi-threaded ReliableUdp, 1, 0, 0, 999, 0, 1, 0, 0, 0, 0, 11.12.2012 19:43:46, 11.12.2012 19:43:46
 Variation der Threadanzahl, Multi-threaded ReliableUdp, 1, 0, 0, 999, 0, 1, 0, 0, 0, 0, 11.12.2012 19:44:55, 11.12.2012 19:44:55
 Variation der Threadanzahl, Multi-threaded ReliableUdp, 1, 0, 0, 999, 0, 1, 0, 0, 0, 0, 11.12.2012 20:16:45, 11.12.2012 20:16:46
+Variation der Threadanzahl, Multi-threaded RMI, 10, 1, 2, 1, 2, 1000, 1000, 1000, 0, 18, 13.12.2012 22:15:28, 13.12.2012 22:15:39
+Variation der Threadanzahl, Multi-threaded RMI, 10, 1, 2, 1, 2, 1000, 1000, 1000, 0, 18, 13.12.2012 22:29:45, 13.12.2012 22:29:56
+Variation der Threadanzahl, Multi-threaded RMI, 10, 1, 2, 1, 2, 1000, 1000, 1000, 0, 18, 9.1.2013 10:51:50, 9.1.2013 10:52:0
+Variation der Threadanzahl, Multi-threaded TCP, 10, 2, 2, 1, 81, 1000, 1000, 1000, 0, 15, 9.1.2013 11:4:56, 9.1.2013 11:5:6
+Variation der Threadanzahl, Single-threaded TCP, 10, 8, 9, 5, 2, 50, 50, 50, 0, 11, 9.1.2013 11:10:22, 9.1.2013 11:10:23
+Variation der Threadanzahl, Multi-threaded TCP, 10, 4, 6, 2, 2, 20, 20, 20, 0, 12, 9.1.2013 11:11:47, 9.1.2013 11:11:48
+Variation der Threadanzahl, Single-threaded TCP, 10, 7, 10, 4, 0, 50, 50, 50, 0, 11, 9.1.2013 11:15:53, 9.1.2013 11:15:54
+Variation der Threadanzahl, Single-threaded TCP, 10, 7, 9, 5, 0, 50, 50, 50, 0, 11, 9.1.2013 11:20:0, 9.1.2013 11:20:0
+Variation der Threadanzahl, Single-threaded TCP, 10, 7, 10, 4, 3, 50, 50, 50, 0, 11, 9.1.2013 11:31:14, 9.1.2013 11:31:14

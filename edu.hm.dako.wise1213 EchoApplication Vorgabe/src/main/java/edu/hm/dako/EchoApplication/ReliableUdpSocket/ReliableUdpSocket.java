@@ -108,7 +108,7 @@ public class ReliableUdpSocket {
 				//outputStreamDerOberenSchicht.flush();
 				status = ConnectionStatus.READY_TO_SEND;
 				while (status != ConnectionStatus.CLOSED) {
-					System.out.println("DataSender");
+					//System.out.println("DataSender");
 					Object o = inputStreamVonDerOberenSchicht.readObject();
 					
 			

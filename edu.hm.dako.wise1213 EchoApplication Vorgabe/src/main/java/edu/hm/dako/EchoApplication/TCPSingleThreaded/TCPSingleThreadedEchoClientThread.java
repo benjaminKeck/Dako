@@ -130,7 +130,7 @@ public class TCPSingleThreadedEchoClientThread extends AbstractClientThread {
 				 * 
 				 */
 				con = new Socket(remoteServerAddress, serverPort);
-				
+				//System.out.println("Client__"+this.getName()+" connected to local: "+con.getLocalPort()+" and port: "+con.getPort());
 				/*In- und Outputstream */
 				out = new ObjectOutputStream(con.getOutputStream());
 				in = new ObjectInputStream(con.getInputStream());

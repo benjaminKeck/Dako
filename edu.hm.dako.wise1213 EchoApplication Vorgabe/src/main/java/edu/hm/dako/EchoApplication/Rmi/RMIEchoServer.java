@@ -63,7 +63,7 @@ public class RMIEchoServer {
 
 			/* Kommunikationsobjekt an Server binden */
 			rmiRegistry.rebind("Server", obj);
-			//System.out.println("binding abgeschlossen");
+			
 
 		} catch (RemoteException e) {
 			e.printStackTrace();
